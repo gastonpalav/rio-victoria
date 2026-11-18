@@ -2,7 +2,6 @@
 import { describe, it, expect, afterEach } from "vitest";
 import { render, screen, cleanup } from "@testing-library/react";
 import { Hero } from "@/components/Hero";
-import { LevelGauge } from "@/components/LevelGauge";
 import { SourceFooter } from "@/components/SourceFooter";
 import { Upstream } from "@/components/Upstream";
 import type { StationDto } from "@/lib/api";
@@ -37,13 +36,14 @@ describe("Hero", () => {
   });
 });
 
-describe("LevelGauge", () => {
-  it("sin umbrales no dibuja nada", () => {
-    const { container } = render(<LevelGauge heightM={1.2} alertM={null} evacuationM={null} />);
-    expect(container.innerHTML).toBe("");
+describe("Hero: la pantalla es la regla", () => {
+  it("sin umbrales no dibuja líneas de alerta ni evacuación", () => {
+    const { container } = render(<Hero station={{ ...victoria, alertM: null, evacuationM: null, level: "sin-umbral" }} />);
+    expect(container.querySelector(".threshold")).toBeNull();
   });
-  it("con umbrales describe la regla para lectores de pantalla", () => {
-    render(<LevelGauge heightM={4.85} alertM={4.6} evacuationM={4.9} />);
+  it("con umbrales dibuja las dos líneas y describe la regla para lectores de pantalla", () => {
+    const { container } = render(<Hero station={victoria} />);
+    expect(container.querySelectorAll(".threshold").length).toBe(2);
     expect(screen.getByRole("img").getAttribute("aria-label")).toContain("4,85");
   });
 });

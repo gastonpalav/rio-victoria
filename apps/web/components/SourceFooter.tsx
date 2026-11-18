@@ -1,6 +1,7 @@
 export function SourceFooter() {
   return (
-    <footer className="footer">
+    <footer className="footer depth depth-3">
+      <div className="inner">
       <p>
         Datos: <a href="https://contenidosweb.prefecturanaval.gob.ar/alturas/">Prefectura Naval Argentina</a>. Sitio no
         oficial, hecho en Victoria. Los niveles de alerta y evacuación son los que publica Prefectura; ante una
@@ -11,6 +12,7 @@ export function SourceFooter() {
         <a href="https://github.com/gastonpalav/rio-victoria">Código</a>
         <a href="/estado">Estado de los datos</a>
       </p>
+      </div>
     </footer>
   );
 }

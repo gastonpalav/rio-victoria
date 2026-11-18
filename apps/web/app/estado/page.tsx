@@ -20,13 +20,13 @@ async function getStatus() {
 export default async function EstadoPage() {
   const { runs, victoria } = await getStatus();
   return (
-    <div className="page">
+    <div className="page page-simple depth">
       <header className="topbar">
         <a href="/" className="home" aria-label="regla, inicio">
           <Logo />
         </a>
       </header>
-      <main className="block">
+      <main className="inner">
         <h1>Estado de los datos</h1>
         <p className="lead">
           Cada 30 minutos se lee la tabla de alturas de Prefectura. Una vez por día se rellenan huecos con su historial.

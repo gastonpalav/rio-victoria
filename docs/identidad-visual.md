@@ -7,25 +7,23 @@ Maquetas: https://claude.ai/artifact/4HWv6SuTpxS6ettcNCXuNG (privado).
 
 La regla hidrométrica — la escala pintada con "E" negras sobre blanco que se ve en los muelles — es el objeto con el que la gente del río lee la altura. La pantalla principal **es** una regla: el agua (marrón, como el Paraná) llega hasta la altura actual y las líneas de alerta y evacuación están pintadas sobre la escala.
 
+## Rediseño (2026-11-18): la pantalla es la regla
+
+Pedido del autor: sacar lo genérico y hacerla vistosa. La regla dejó de ser un dibujo al costado:
+
+- **Portada**: el cielo arriba; el agua marrón llena la pantalla desde abajo hasta la altura real (sube al cargar). La escala con las "E" va pintada sobre todo el borde izquierdo. Las líneas de alerta (punteada) y evacuación (continua) cruzan la pantalla de lado a lado. El número gigante flota sobre la superficie.
+- **Al bajar te sumergís**: cada sección es más honda (`--river-2` → `--river-3` → `--river-bed`). La gráfica está bajo el agua en arena; "lo que viene de arriba" es una línea de río que baja hasta el puerto que mirás.
+- La escala se estira si el río está muy por debajo de los niveles, para que siempre se vean el agua y las líneas (`lib/scale.ts`).
+
 ## Nombre
 
 **regla** (minúsculas). Se lee "la regla marca 4,85".
 
 ## Color
 
-| Token | Claro | Oscuro | Uso |
-|---|---|---|---|
-| `--bg` | `#F3F6F8` | `#0E161C` | fondo (cielo frío, no crema) |
-| `--ink` | `#14212B` | `#EEF2F4` | texto, marcas de la regla |
-| `--muted` | `#4F5E69` | `#9DABB5` | texto secundario (≥ 4.5:1) |
-| `--line` | `#D3DCE2` | `#2A3A45` | divisores, bordes |
-| `--staff` | `#FFFFFF` | `#E6ECEF` | esmalte de la regla |
-| `--mark` | `#14212B` | `#0E161C` | marcas "E" de la regla (siempre oscuras) |
-| `--water` | `#8B6640` | `#A67E52` | agua del Paraná, gráficas |
-| `--alert` | `#B86E00` | `#F0A23B` | nivel de alerta (línea **punteada**) |
-| `--evac` | `#C2182B` | `#FF5D6C` | nivel de evacuación (línea **continua**) |
-
-Alerta y evacuación se distinguen también por trazo (punteado/continuo) y texto, no solo por color.
+Cielo (cambia con claro/oscuro): `--sky` #CFDDE4 / #0A1319, tinta `--sky-ink` #10202A / #E9EEF1.
+Río (igual en ambos modos, cada vez más hondo): `--river` #7A5533, `--river-2` #5E3F24, `--river-3` #46301C, `--river-bed` #2B1E12; texto `--on-river` #FFF3E2, `--sand` #F2C98A para gráficas y el puerto actual.
+Niveles: alerta ámbar (punteada), evacuación roja (continua) — distintos también por trazo y texto.
 
 ## Tipografía
 

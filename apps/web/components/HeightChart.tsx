@@ -57,7 +57,7 @@ export function HeightChart({ slug, initial, initialFrom, to, alertM, evacuation
   const shown = cache[range.key] ? range : RANGES[0]!;
 
   return (
-    <section className="block">
+    <>
       <h2>{rangeHeadline(current.points, shown)}</h2>
       <div className="range-buttons" role="group" aria-label="Período de la gráfica">
         {RANGES.map((r, i) => (
@@ -86,6 +86,6 @@ export function HeightChart({ slug, initial, initialFrom, to, alertM, evacuation
         <text x={W / 2} y={H + 22} fontSize={14} fill="var(--muted)" textAnchor="middle">{fmtDay(mid)}</text>
         <text x={W} y={H + 22} fontSize={14} fill="var(--muted)" textAnchor="end">hoy</text>
       </svg>
-    </section>
+    </>
   );
 }

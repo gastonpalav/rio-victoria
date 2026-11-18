@@ -1,7 +1,11 @@
 import type { StationDto } from "./api";
 
 export const fmtM = (m: number) => m.toFixed(2).replace(".", ",");
-export const cm = (m: number) => `${Math.round(Math.abs(m) * 100)} cm`;
+/** Distancia legible: "5 cm" o, desde un metro, "1,40 m". */
+export const cm = (m: number) => {
+  const c = Math.round(Math.abs(m) * 100);
+  return c >= 100 ? `${(c / 100).toFixed(2).replace(".", ",")} m` : `${c} cm`;
+};
 
 export const TREND_LABEL = { crece: "Creciendo", baja: "Bajando", estable: "Estable" } as const;
 

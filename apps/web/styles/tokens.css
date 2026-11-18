@@ -1,46 +1,56 @@
-/* Identidad "regla" — ver docs/identidad-visual.md */
+/* Identidad "regla" — ver docs/identidad-visual.md
+   Arriba el cielo (cambia con claro/oscuro); abajo el río, siempre marrón Paraná, cada vez más hondo. */
 :root {
-  --bg: #F3F6F8;
-  --ink: #14212B;
-  --muted: #4F5E69;
-  --line: #D3DCE2;
+  --sky: #CFDDE4;
+  --sky-ink: #10202A;
+  --sky-muted: #3E5361;
+  --sky-line: #9FB4BF;
+  --alert-sky: #8F5200;
+  --evac-sky: #B3121F;
+
+  --river: #7A5533;
+  --river-2: #5E3F24;
+  --river-3: #46301C;
+  --river-bed: #2B1E12;
+  --on-river: #FFF3E2;
+  --on-river-muted: #E6CDAE;
+  --sand: #F2C98A;
+  --alert-river: #FFB238;
+  --evac-river: #FF7A7A;
+
   --staff: #FFFFFF;
-  --mark: #14212B;
-  --water: #8B6640;
-  --water-top: #5E4329;
-  --alert: #B86E00;
-  --evac: #C2182B;
-  --evac-text: #B0172A;
-  --font: "Archivo", system-ui, sans-serif;
+  --mark: #10202A;
+
+  /* compatibilidad con componentes que usan los nombres genéricos */
+  --bg: var(--sky);
+  --ink: var(--sky-ink);
+  --muted: var(--sky-muted);
+  --line: var(--sky-line);
+  --water: var(--river);
+  --alert: var(--alert-sky);
+  --evac: var(--evac-sky);
+  --evac-text: var(--evac-sky);
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #0E161C;
-    --ink: #EEF2F4;
-    --muted: #9DABB5;
-    --line: #2A3A45;
-    --staff: #E6ECEF;
-    --mark: #0E161C;
-    --water: #A67E52;
-    --water-top: #D9B88C;
-    --alert: #F0A23B;
-    --evac: #FF5D6C;
-    --evac-text: #FF8A94;
+    --sky: #0A1319;
+    --sky-ink: #E9EEF1;
+    --sky-muted: #94A6B2;
+    --sky-line: #2A3B47;
+    --alert-sky: #FFB238;
+    --evac-sky: #FF6170;
+    --staff: #E9EEF1;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #0E161C;
-  --ink: #EEF2F4;
-  --muted: #9DABB5;
-  --line: #2A3A45;
-  --staff: #E6ECEF;
-  --mark: #0E161C;
-  --water: #A67E52;
-  --water-top: #D9B88C;
-  --alert: #F0A23B;
-  --evac: #FF5D6C;
-  --evac-text: #FF8A94;
+  --sky: #0A1319;
+  --sky-ink: #E9EEF1;
+  --sky-muted: #94A6B2;
+  --sky-line: #2A3B47;
+  --alert-sky: #FFB238;
+  --evac-sky: #FF6170;
+  --staff: #E9EEF1;
   color-scheme: dark;
 }

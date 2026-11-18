@@ -22,16 +22,20 @@ export async function StationView({ slug }: { slug: string }) {
       <main>
         <h1 className="sr-only">Altura del río en {station.name}</h1>
         <Hero station={station} />
-        <HeightChart
-          key={station.slug}
-          slug={station.slug}
-          initial={series}
-          initialFrom={from}
-          to={to}
-          alertM={station.alertM}
-          evacuationM={station.evacuationM}
-        />
-        <Upstream stations={upstream} />
+        <section className="depth depth-1">
+          <div className="inner">
+            <HeightChart
+              key={station.slug}
+              slug={station.slug}
+              initial={series}
+              initialFrom={from}
+              to={to}
+              alertM={station.alertM}
+              evacuationM={station.evacuationM}
+            />
+          </div>
+        </section>
+        <Upstream stations={upstream} here={station} />
       </main>
       <SourceFooter />
     </div>
