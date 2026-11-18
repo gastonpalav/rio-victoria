@@ -6,12 +6,12 @@
 
 html {
   -webkit-text-size-adjust: 100%;
-  background: var(--river-bed);
+  background: var(--navy);
 }
 
 body {
   margin: 0;
-  background: var(--sky);
+  background: var(--paper);
   color: var(--sky-ink);
   font-family: var(--font-archivo), "Archivo", system-ui, sans-serif;
   font-size: 16px;
@@ -24,7 +24,7 @@ a {
 }
 
 :focus-visible {
-  outline: 3px solid var(--sand);
+  outline: 3px solid var(--sky-ink);
   outline-offset: 2px;
 }
 
@@ -104,7 +104,7 @@ a {
   min-height: 620px;
   max-height: 1100px;
   overflow: hidden;
-  background: var(--sky);
+  background: linear-gradient(180deg, var(--sky-top) 0%, var(--sky) 45%, var(--sky-horizon) 100%);
   isolation: isolate;
 }
 .river-hero-empty {
@@ -148,7 +148,7 @@ a {
   inset: auto 0 0 0;
   height: calc(var(--level) * 100%);
   z-index: 2;
-  background: linear-gradient(180deg, color-mix(in srgb, var(--river) 94%, transparent) 0%, var(--river-2) 100%);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--river) 95%, transparent) 0%, var(--river-2) 100%);
   animation: rise 1.8s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 @keyframes rise {
@@ -273,32 +273,31 @@ a {
   margin: 0 0 12px;
   padding: 8px 12px;
   border-radius: 8px;
-  background: var(--alert-river);
-  color: #1d1305;
+  background: #FFC24A;
+  color: #2A1600;
   font-size: 14px;
   font-weight: 700;
   max-width: 420px;
 }
 
-/* ---------- Bajo el agua: cada sección más honda ---------- */
+/* ---------- Debajo del agua: secciones claras, el río como acento ---------- */
 .depth {
-  color: var(--on-river);
-  --ink: var(--on-river);
-  --muted: var(--on-river-muted);
-  --line: color-mix(in srgb, var(--on-river) 22%, transparent);
-  --water: var(--sand);
-  --alert: var(--alert-river);
-  --evac: var(--evac-river);
-  --evac-text: var(--evac-river);
+  color: var(--sky-ink);
 }
 .depth-1 {
-  background: var(--river-2);
+  background: var(--paper);
+  border-top: 10px solid var(--river-2);
 }
 .depth-2 {
-  background: linear-gradient(180deg, var(--river-2), var(--river-3) 30%);
+  background: var(--paper-2);
 }
 .depth-3 {
-  background: linear-gradient(180deg, var(--river-3), var(--river-bed) 40%);
+  background: var(--navy);
+  color: var(--on-navy);
+  --ink: var(--on-navy);
+  --muted: var(--on-navy);
+  --line: color-mix(in srgb, var(--on-navy) 25%, transparent);
+  --water: #D9A35F;
 }
 .inner {
   max-width: 640px;
@@ -320,7 +319,7 @@ a {
 .lead {
   margin: 0;
   font-size: 15px;
-  color: var(--on-river-muted);
+  color: var(--sky-muted);
   max-width: 44ch;
 }
 
@@ -335,14 +334,14 @@ a {
   border-radius: 20px;
   border: 1.5px solid var(--line);
   background: transparent;
-  color: var(--on-river);
+  color: var(--sky-ink);
   font: 700 14px var(--font-archivo), sans-serif;
   cursor: pointer;
 }
 .range-buttons button[aria-pressed="true"] {
-  background: var(--sand);
-  border-color: var(--sand);
-  color: var(--river-bed);
+  background: var(--sky-ink);
+  border-color: var(--sky-ink);
+  color: #FFFFFF;
 }
 .chart {
   width: 100%;
@@ -356,7 +355,7 @@ a {
 }
 .chart-error {
   margin: 0;
-  color: var(--evac-river);
+  color: var(--evac-text);
   font-size: 14px;
 }
 
@@ -375,7 +374,7 @@ a {
   bottom: 18px;
   width: 6px;
   border-radius: 3px;
-  background: linear-gradient(180deg, color-mix(in srgb, var(--sand) 35%, transparent), var(--sand));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--river) 35%, transparent), var(--river));
 }
 .river-stop {
   position: relative;
@@ -391,8 +390,8 @@ a {
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: var(--river-3);
-  border: 4px solid var(--sand);
+  background: var(--paper-2);
+  border: 4px solid var(--river);
   z-index: 1;
 }
 .stop-name {
@@ -407,10 +406,10 @@ a {
 .note {
   font-size: 13px;
   font-weight: 600;
-  color: var(--on-river-muted);
+  color: var(--sky-muted);
 }
 .note-over {
-  color: var(--evac-river);
+  color: var(--evac-text);
 }
 .stop-value {
   display: flex;
@@ -429,22 +428,22 @@ a {
   align-items: center;
   gap: 4px;
   font-size: 13px;
-  color: var(--on-river-muted);
+  color: var(--sky-muted);
   min-width: 18px;
 }
 .river-here .stop-dot {
-  background: var(--sand);
-  box-shadow: 0 0 0 6px color-mix(in srgb, var(--sand) 30%, transparent);
+  background: var(--river);
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--river) 25%, transparent);
 }
 .river-here .stop-name strong,
 .river-here .mid-number {
-  color: var(--sand);
+  color: var(--river-2);
 }
 
 /* ---------- Pie: el lecho ---------- */
 .footer {
   font-size: 13px;
-  color: var(--on-river-muted);
+  color: var(--on-navy);
 }
 .footer .inner {
   padding-top: 48px;
@@ -459,13 +458,13 @@ a {
   flex-wrap: wrap;
   gap: 18px;
   font-weight: 700;
-  color: var(--on-river);
+  color: #FFFFFF;
 }
 
 /* ---------- Páginas simples (estado, 404) ---------- */
 .page-simple {
   min-height: 100vh;
-  background: var(--river-3);
+  background: var(--paper);
 }
 .page-simple .topbar {
   position: static;

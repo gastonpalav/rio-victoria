@@ -12,7 +12,7 @@ La regla hidrométrica — la escala pintada con "E" negras sobre blanco que se 
 Pedido del autor: sacar lo genérico y hacerla vistosa. La regla dejó de ser un dibujo al costado:
 
 - **Portada**: el cielo arriba; el agua marrón llena la pantalla desde abajo hasta la altura real (sube al cargar). La escala con las "E" va pintada sobre todo el borde izquierdo. Las líneas de alerta (punteada) y evacuación (continua) cruzan la pantalla de lado a lado. El número gigante flota sobre la superficie.
-- **Al bajar te sumergís**: cada sección es más honda (`--river-2` → `--river-3` → `--river-bed`). La gráfica está bajo el agua en arena; "lo que viene de arriba" es una línea de río que baja hasta el puerto que mirás.
+- **Debajo**: secciones claras con el río como acento; "lo que viene de arriba" es una línea de río que baja hasta el puerto que mirás. El pie, azul marino.
 - La escala se estira si el río está muy por debajo de los niveles, para que siempre se vean el agua y las líneas (`lib/scale.ts`).
 
 ## Nombre
@@ -21,9 +21,12 @@ Pedido del autor: sacar lo genérico y hacerla vistosa. La regla dejó de ser un
 
 ## Color
 
-Cielo (cambia con claro/oscuro): `--sky` #CFDDE4 / #0A1319, tinta `--sky-ink` #10202A / #E9EEF1.
-Río (igual en ambos modos, cada vez más hondo): `--river` #7A5533, `--river-2` #5E3F24, `--river-3` #46301C, `--river-bed` #2B1E12; texto `--on-river` #FFF3E2, `--sand` #F2C98A para gráficas y el puerto actual.
-Niveles: alerta ámbar (punteada), evacuación roja (continua) — distintos también por trazo y texto.
+**Siempre en claro** (pedido del autor, 2026-11-18): no sigue el modo oscuro del sistema. Nada de crema ni terracota.
+
+- Cielo de día, degradé hacia el horizonte: `--sky-top` #9FD3EE → `--sky` #CFEAF7 → `--sky-horizon` #EEF8FD. Tinta azul marino `--sky-ink` #0B2233.
+- Agua café con leche del Paraná: `--river` #9A6B3E → `--river-2` #7E5530, texto `--on-river` #FFF8EE.
+- Secciones de abajo en blanco frío (`--paper` #F5FAFD, `--paper-2` #E7F1F7) con el río como acento; pie azul marino `--navy`.
+- Niveles: alerta ámbar (punteada), evacuación roja (continua), distintos también por trazo y texto.
 
 ## Tipografía
 
