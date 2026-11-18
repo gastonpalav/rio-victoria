@@ -19,7 +19,8 @@ export async function POST(request: NextRequest) {
       mode === "gapfill"
         ? await runBackfill(db, fetchPrefectura, { days: 7, pauseMs: 300 })
         : await runScrape(db, fetchPrefectura);
-    revalidateTag(READINGS_TAG, "max");
+    // expire: 0 → el próximo pedido ya ve los datos nuevos (con "max" se serviría la versión vieja una vez más).
+    revalidateTag(READINGS_TAG, { expire: 0 });
     return Response.json({ mode, ...result }, { status: result.ok ? 200 : 207 });
   } catch (e) {
     return Response.json({ mode, ok: false, error: e instanceof Error ? e.message : String(e) }, { status: 502 });

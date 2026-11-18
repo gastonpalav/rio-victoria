@@ -63,3 +63,14 @@ describe("SourceFooter", () => {
     expect(document.body.textContent).toContain("Sitio no oficial");
   });
 });
+
+describe("frescura calculada en el navegador (la caché del servidor puede tener el flag congelado)", () => {
+  it("Hero avisa aunque el servidor haya dicho stale:false si la lectura ya es vieja", () => {
+    render(<Hero station={{ ...victoria, ts: "2020-01-01T12:00:00.000Z", stale: false }} />);
+    expect(document.body.textContent).toContain("Prefectura no publicó datos nuevos desde");
+  });
+  it("Upstream marca dato viejo aunque el servidor haya dicho stale:false", () => {
+    render(<Upstream stations={[{ ...victoria, slug: "parana", name: "Paraná", ts: "2020-01-01T12:00:00.000Z", stale: false }]} />);
+    expect(document.body.textContent).toContain("dato viejo");
+  });
+});

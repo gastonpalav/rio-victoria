@@ -11,16 +11,13 @@ export type StationWithLatest = Station & { latest: Point | null; previous: Poin
 export type ReadingSource = "tabla" | "historial";
 
 export async function upsertStations(db: Db, rows: CurrentRow[]): Promise<void> {
-  const orderByRiver = new Map<string, number>();
   const values = rows.map((r) => {
-    const order = orderByRiver.get(r.river) ?? 0;
-    orderByRiver.set(r.river, order + 1);
     return {
       id: r.prefecturaId,
       slug: slugify(r.name),
       name: r.name,
       river: r.river,
-      riverOrder: order,
+      riverOrder: r.riverOrder,
       alertM: r.alertM,
       evacuationM: r.evacuationM,
       periodHours: r.periodHours,
@@ -55,9 +52,11 @@ const CHUNK = 500;
  * La tabla principal siempre gana: el historial solo actualiza filas que también vinieron del historial.
  */
 export async function upsertReadings(db: Db, stationId: number, points: Point[], source: ReadingSource): Promise<number> {
+  // Postgres no acepta tocar la misma fila dos veces en un mismo INSERT ... ON CONFLICT: dedupe por hora (gana el último).
+  const unique = [...new Map(points.map((p) => [p.ts.getTime(), p])).values()];
   let inserted = 0;
-  for (let i = 0; i < points.length; i += CHUNK) {
-    const chunk = points.slice(i, i + CHUNK);
+  for (let i = 0; i < unique.length; i += CHUNK) {
+    const chunk = unique.slice(i, i + CHUNK);
     const setWhere =
       source === "tabla"
         ? sql`${readings.heightM} <> excluded.height_m or ${readings.source} <> 'tabla'`

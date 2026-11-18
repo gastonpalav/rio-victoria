@@ -14,14 +14,14 @@ export function getDb(): Db {
 /** Estaciones con su última lectura. Caché de 5 min; la ruta de scrape la invalida al guardar. */
 export async function getStationsData() {
   "use cache";
-  cacheLife({ stale: 60, revalidate: 300, expire: 86_400 });
+  cacheLife({ stale: 60, revalidate: 300, expire: 3600 });
   cacheTag(READINGS_TAG);
   return buildStationsPayload(getDb(), new Date());
 }
 
 export async function getReadingsData(slug: string, from: string | null, to: string | null, nowIso: string) {
   "use cache";
-  cacheLife({ stale: 60, revalidate: 300, expire: 86_400 });
+  cacheLife({ stale: 60, revalidate: 300, expire: 3600 });
   cacheTag(READINGS_TAG, `readings-${slug}`);
   return buildReadingsPayload(getDb(), slug, from, to, new Date(nowIso));
 }
@@ -29,7 +29,7 @@ export async function getReadingsData(slug: string, from: string | null, to: str
 /** Todo lo que necesita la página de un puerto, en una sola entrada de caché. null si no existe. */
 export async function getStationPage(slug: string) {
   "use cache";
-  cacheLife({ stale: 60, revalidate: 300, expire: 86_400 });
+  cacheLife({ stale: 60, revalidate: 300, expire: 3600 });
   cacheTag(READINGS_TAG, `readings-${slug}`);
   const now = new Date();
   const { stations } = await buildStationsPayload(getDb(), now);

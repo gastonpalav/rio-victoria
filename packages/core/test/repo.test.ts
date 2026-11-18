@@ -74,3 +74,11 @@ describe("repo", () => {
     expect((await getLastRuns(db, 1))[0]).toMatchObject({ kind: "scrape", ok: false, error: "timeout", skipped: 2 });
   });
 });
+
+describe("repo: lecturas duplicadas", () => {
+  it("dos puntos con la misma hora en un mismo insert no rompen el upsert", async () => {
+    const n = await upsertReadings(db, 260, [{ ts: T, heightM: 4.84 }, { ts: T, heightM: 4.85 }], "tabla");
+    expect(n).toBe(1);
+    expect((await getSeries(db, 260, T0, T1))[0]!.heightM).toBeCloseTo(4.85);
+  });
+});

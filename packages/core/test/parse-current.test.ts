@@ -48,3 +48,25 @@ describe("parseCurrentTable", () => {
     expect(() => parseCurrentTable("<html><body>Mantenimiento</body></html>")).toThrow(ParseError);
   });
 });
+
+describe("parseCurrentTable: cambios de estructura fallan ruidosamente", () => {
+  it("si cambia el formato de fecha y se saltean casi todas las filas, lanza", () => {
+    const broken = html.replace(/(\d{2})\/([A-Z]{3})\/(\d{2}) - (\d{4})/g, "$1-$2-$3 $4");
+    expect(() => parseCurrentTable(broken)).toThrow(ParseError);
+  });
+  it("si desaparece la columna Alerta, lanza (no pisa umbrales con null)", () => {
+    expect(() => parseCurrentTable(html.replaceAll('data-label="Alerta:"', 'data-label="Nivel Alerta:"'))).toThrow(ParseError);
+  });
+});
+
+describe("parseCurrentTable: orden dentro del río", () => {
+  it("una fila salteada no corre el orden de las demás", () => {
+    const { rows } = parseCurrentTable(html);
+    const diamante = rows.find((r) => r.name === "DIAMANTE")!.riverOrder;
+    const broken = html.replace(/(SANTA FE<\/th>[\s\S]*?Ultimo Registro:"[^>]*>)[\d.]+/, "$1S/D");
+    const r2 = parseCurrentTable(broken);
+    expect(r2.rows.find((r) => r.name === "SANTA FE")).toBeUndefined();
+    expect(r2.rows.find((r) => r.name === "DIAMANTE")!.riverOrder).toBe(diamante);
+    expect(rows.find((r) => r.name === "SANTA FE")!.riverOrder).toBe(diamante - 1);
+  });
+});

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { cacheLife, cacheTag } from "next/cache";
 import { formatArt, getLastRuns } from "@rio/core";
 import { Logo } from "@/components/Logo";
+import { publicError } from "@/lib/public-error";
 import { SourceFooter } from "@/components/SourceFooter";
 import { getDb, getStationsData, READINGS_TAG } from "@/lib/data";
 
@@ -50,7 +51,7 @@ export default async function EstadoPage() {
                 <tr key={r.id}>
                   <td>{formatArt(new Date(r.startedAt))}</td>
                   <td>{r.kind}</td>
-                  <td>{r.ok === null ? "en curso" : r.ok ? "bien" : `falló: ${r.error ?? ""}`}</td>
+                  <td>{r.ok === null ? "en curso" : r.ok ? "bien" : `falló: ${publicError(r.error) ?? ""}`}</td>
                   <td>{r.inserted}</td>
                 </tr>
               ))}

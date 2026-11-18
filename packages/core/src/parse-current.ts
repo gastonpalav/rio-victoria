@@ -15,6 +15,8 @@ export type CurrentRow = {
   prevTs: Date | null;
   alertM: number | null;
   evacuationM: number | null;
+  /** Posición dentro de su río según el orden de la página (aguas abajo), contando filas salteadas. */
+  riverOrder: number;
 };
 
 export type SkippedRow = { name: string; reason: string };
@@ -44,6 +46,8 @@ export function parseCurrentTable(html: string): { rows: CurrentRow[]; skipped: 
   const rows: CurrentRow[] = [];
   const skipped: SkippedRow[] = [];
   let sawHeightColumn = false;
+  let sawAlertColumn = false;
+  const orderByRiver = new Map<string, number>();
 
   trs.each((_, tr) => {
     const $tr = $(tr);
@@ -54,6 +58,10 @@ export function parseCurrentTable(html: string): { rows: CurrentRow[]; skipped: 
     const name = $tr.find('th[data-label="Puerto:"]').text().replace(/\s+/g, " ").trim();
     const rawHeight = cell("Ultimo Registro:");
     if (rawHeight !== undefined) sawHeightColumn = true;
+    if (cell("Alerta:") !== undefined) sawAlertColumn = true;
+    const river = cell("Río:") ?? "";
+    const riverOrder = orderByRiver.get(river) ?? 0;
+    orderByRiver.set(river, riverOrder + 1);
 
     const href = $tr.find('a[href*="historico"]').attr("href") ?? "";
     const idMatch = /[?&]id=(\d+)/.exec(href);
@@ -67,7 +75,7 @@ export function parseCurrentTable(html: string): { rows: CurrentRow[]; skipped: 
     rows.push({
       prefecturaId: Number(idMatch[1]),
       name,
-      river: cell("Río:") ?? "",
+      river,
       heightM,
       variationM: num(cell("Variacion")),
       periodHours: num(cell("Periodo")),
@@ -77,9 +85,15 @@ export function parseCurrentTable(html: string): { rows: CurrentRow[]; skipped: 
       prevTs: dateOrNull(cell("Fecha Anterior:")),
       alertM: num(cell("Alerta:")),
       evacuationM: num(cell("Evacuación:")),
+      riverOrder,
     });
   });
 
   if (!sawHeightColumn) throw new ParseError('Falta la columna "Ultimo Registro:" — cambió la estructura de la página');
+  if (!sawAlertColumn) throw new ParseError('Falta la columna "Alerta:" — cambió la estructura de la página');
+  // Si se saltea más de la mitad, lo más probable es que haya cambiado un formato: mejor fallar que guardar poco.
+  if (rows.length === 0 || skipped.length > trs.length / 2) {
+    throw new ParseError(`Se saltearon ${skipped.length} de ${trs.length} filas — ¿cambió el formato? Ej.: ${skipped[0]?.reason ?? ""}`);
+  }
   return { rows, skipped };
 }

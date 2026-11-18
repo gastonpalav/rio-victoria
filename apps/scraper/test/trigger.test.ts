@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { triggerScrape, modeForNow } from "../src/trigger";
+import { triggerScrape, modeForNow, modesForNow } from "../src/trigger";
 
 describe("triggerScrape", () => {
   it("hace POST con el secreto y devuelve el resultado", async () => {
@@ -25,5 +25,19 @@ describe("modeForNow", () => {
     expect(modeForNow(new Date("2026-11-19T06:10:00Z"))).toBe("gapfill");
     expect(modeForNow(new Date("2026-11-19T06:40:00Z"))).toBe("scrape");
     expect(modeForNow(new Date("2026-11-19T12:00:00Z"))).toBe("scrape");
+  });
+});
+
+describe("triggerScrape: fallas parciales", () => {
+  it("lanza si la ruta responde 207 con ok:false (gapfill con estaciones fallidas)", async () => {
+    const fakeFetch = async () => new Response(JSON.stringify({ ok: false, inserted: 10, skipped: 3 }), { status: 207 });
+    await expect(triggerScrape("https://x/api", "s3", "gapfill", fakeFetch as unknown as typeof fetch)).rejects.toThrow(/ok:false|fall/i);
+  });
+});
+
+describe("modesForNow", () => {
+  it("a las 06 UTC corre la lectura normal y además el relleno de huecos", () => {
+    expect(modesForNow(new Date("2026-11-19T06:10:00Z"))).toEqual(["scrape", "gapfill"]);
+    expect(modesForNow(new Date("2026-11-19T12:00:00Z"))).toEqual(["scrape"]);
   });
 });

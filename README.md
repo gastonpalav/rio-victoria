@@ -72,6 +72,18 @@ npm start -- backfill         # carga el último año de historial de todos los 
 cd apps/web && npm run dev
 ```
 
+## Variables de entorno
+
+| Variable | Dónde | Para qué |
+|---|---|---|
+| `DATABASE_URL` | Vercel, local | Postgres (en Vercel, la URL pública del TCP proxy de Railway) |
+| `SCRAPE_SECRET` | Vercel y Railway | clave compartida para `POST /api/internal/scrape` |
+| `SCRAPE_URL` | Railway | `https://<dominio>/api/internal/scrape` |
+| `SITE_URL` | Vercel (opcional) | URL base para las imágenes de vista previa |
+| `REPO_URL` | opcional | se agrega al User-Agent del scraper |
+
+El servicio de Railway corre `npm start -- trigger` (ver `railway.json`) cada 30 minutos: dispara la lectura en Vercel y, a las 06 UTC, también el relleno de huecos con el historial.
+
 ## Stack
 
 TypeScript · Next.js 16 (App Router, Cache Components) · Drizzle ORM · Postgres · cheerio · Vitest + PGlite · Railway · Vercel.

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { StationDto } from "@/lib/api";
 import { fmtM, upstreamNote } from "@/lib/copy";
+import { StaleTag } from "./Freshness";
 
 const TREND_SHORT = { crece: "sube", baja: "baja", estable: "estable" } as const;
 
@@ -25,7 +26,7 @@ export function Upstream({ stations }: { stations: StationDto[] }) {
                   <span className="mid-number">{u.heightM === null ? "—" : fmtM(u.heightM)}</span>
                   <span className="trend-short">
                     {u.trend ? TREND_SHORT[u.trend] : ""}
-                    {u.stale ? ", dato viejo" : ""}
+                    {u.ts && <StaleTag ts={u.ts} periodHours={u.periodHours} initialStale={u.stale} />}
                   </span>
                 </span>
               </Link>

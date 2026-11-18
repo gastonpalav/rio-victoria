@@ -6,7 +6,10 @@ import "./globals.css";
 const archivo = Archivo({ subsets: ["latin"], axes: ["wdth"], variable: "--font-archivo", display: "swap" });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.SITE_URL ?? "http://localhost:3000"),
+  metadataBase: new URL(
+    process.env.SITE_URL ??
+      (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : "http://localhost:3000"),
+  ),
   title: "regla — altura del río Paraná en Victoria",
   description: "La altura del río Paraná en Victoria (Entre Ríos) y aguas arriba, con datos de Prefectura Naval Argentina.",
 };
