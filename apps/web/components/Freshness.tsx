@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { formatArt, staleness } from "@rio/core";
+import { formatArt, staleness } from "@rio/core/pure";
 import { RelativeTime } from "./RelativeTime";
 
 /**
