@@ -1,0 +1,43 @@
+/* Identidad "regla" — ver docs/identidad-visual.md */
+:root {
+  --bg: #F3F6F8;
+  --ink: #14212B;
+  --muted: #4F5E69;
+  --line: #D3DCE2;
+  --staff: #FFFFFF;
+  --water: #8B6640;
+  --water-top: #5E4329;
+  --alert: #B86E00;
+  --evac: #C2182B;
+  --evac-text: #B0172A;
+  --font: "Archivo", system-ui, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0E161C;
+    --ink: #EEF2F4;
+    --muted: #9DABB5;
+    --line: #2A3A45;
+    --staff: #E6ECEF;
+    --water: #A67E52;
+    --water-top: #D9B88C;
+    --alert: #F0A23B;
+    --evac: #FF5D6C;
+    --evac-text: #FF8A94;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0E161C;
+  --ink: #EEF2F4;
+  --muted: #9DABB5;
+  --line: #2A3A45;
+  --staff: #E6ECEF;
+  --water: #A67E52;
+  --water-top: #D9B88C;
+  --alert: #F0A23B;
+  --evac: #FF5D6C;
+  --evac-text: #FF8A94;
+  color-scheme: dark;
+}
