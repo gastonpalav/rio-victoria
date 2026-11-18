@@ -6,3 +6,4 @@ export * from "./parse-history";
 export * from "./stations";
 export * from "./db/client";
 export * from "./db/repo";
+export * from "./domain";
