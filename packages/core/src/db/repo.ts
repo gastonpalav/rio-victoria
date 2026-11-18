@@ -1,0 +1,143 @@
+import { and, asc, desc, eq, gte, lte, sql } from "drizzle-orm";
+import type { Db } from "./client";
+import { readings, scrapeRuns, stations } from "./schema";
+import type { CurrentRow } from "../parse-current";
+import { slugify } from "../slug";
+import { isHidden } from "../stations";
+
+export type Station = typeof stations.$inferSelect;
+export type Point = { ts: Date; heightM: number };
+export type StationWithLatest = Station & { latest: Point | null; previous: Point | null };
+export type ReadingSource = "tabla" | "historial";
+
+export async function upsertStations(db: Db, rows: CurrentRow[]): Promise<void> {
+  const orderByRiver = new Map<string, number>();
+  const values = rows.map((r) => {
+    const order = orderByRiver.get(r.river) ?? 0;
+    orderByRiver.set(r.river, order + 1);
+    return {
+      id: r.prefecturaId,
+      slug: slugify(r.name),
+      name: r.name,
+      river: r.river,
+      riverOrder: order,
+      alertM: r.alertM,
+      evacuationM: r.evacuationM,
+      periodHours: r.periodHours,
+      hidden: isHidden(r.name),
+      updatedAt: new Date(),
+    };
+  });
+  if (values.length === 0) return;
+  await db
+    .insert(stations)
+    .values(values)
+    .onConflictDoUpdate({
+      target: stations.id,
+      set: {
+        slug: sql`excluded.slug`,
+        name: sql`excluded.name`,
+        river: sql`excluded.river`,
+        riverOrder: sql`excluded.river_order`,
+        alertM: sql`excluded.alert_m`,
+        evacuationM: sql`excluded.evacuation_m`,
+        periodHours: sql`excluded.period_hours`,
+        hidden: sql`excluded.hidden`,
+        updatedAt: sql`excluded.updated_at`,
+      },
+    });
+}
+
+const CHUNK = 500;
+
+/**
+ * Inserta o actualiza lecturas. Devuelve cuántas filas eran nuevas.
+ * La tabla principal siempre gana: el historial solo actualiza filas que también vinieron del historial.
+ */
+export async function upsertReadings(db: Db, stationId: number, points: Point[], source: ReadingSource): Promise<number> {
+  let inserted = 0;
+  for (let i = 0; i < points.length; i += CHUNK) {
+    const chunk = points.slice(i, i + CHUNK);
+    const setWhere =
+      source === "tabla"
+        ? sql`${readings.heightM} <> excluded.height_m or ${readings.source} <> 'tabla'`
+        : sql`${readings.source} = 'historial' and ${readings.heightM} <> excluded.height_m`;
+    const res = await db
+      .insert(readings)
+      .values(chunk.map((p) => ({ stationId, ts: p.ts, heightM: p.heightM, source, scrapedAt: new Date() })))
+      .onConflictDoUpdate({
+        target: [readings.stationId, readings.ts],
+        set: { heightM: sql`excluded.height_m`, source: sql`excluded.source`, scrapedAt: sql`excluded.scraped_at` },
+        setWhere,
+      })
+      .returning({ isNew: sql<boolean>`(xmax = 0)` });
+    inserted += res.filter((r) => r.isNew).length;
+  }
+  return inserted;
+}
+
+export async function getStationBySlug(db: Db, slug: string): Promise<Station | null> {
+  const [s] = await db.select().from(stations).where(eq(stations.slug, slug)).limit(1);
+  return s ?? null;
+}
+
+export async function getStations(db: Db): Promise<StationWithLatest[]> {
+  const all = await db
+    .select()
+    .from(stations)
+    .where(eq(stations.hidden, false))
+    .orderBy(asc(stations.river), asc(stations.riverOrder));
+
+  const ranked = db
+    .select({
+      stationId: readings.stationId,
+      ts: readings.ts,
+      heightM: readings.heightM,
+      rn: sql<number>`row_number() over (partition by ${readings.stationId} order by ${readings.ts} desc)`.as("rn"),
+    })
+    .from(readings)
+    .as("ranked");
+  const last2 = await db.select().from(ranked).where(lte(ranked.rn, 2));
+
+  const byStation = new Map<number, Point[]>();
+  for (const r of last2) {
+    const list = byStation.get(r.stationId) ?? [];
+    list[Number(r.rn) - 1] = { ts: new Date(r.ts), heightM: r.heightM };
+    byStation.set(r.stationId, list);
+  }
+  return all.map((s) => {
+    const l = byStation.get(s.id) ?? [];
+    return { ...s, latest: l[0] ?? null, previous: l[1] ?? null };
+  });
+}
+
+export async function getSeries(db: Db, stationId: number, from: Date, to: Date): Promise<Point[]> {
+  const rows = await db
+    .select({ ts: readings.ts, heightM: readings.heightM })
+    .from(readings)
+    .where(and(eq(readings.stationId, stationId), gte(readings.ts, from), lte(readings.ts, to)))
+    .orderBy(asc(readings.ts));
+  return rows.map((r) => ({ ts: new Date(r.ts), heightM: r.heightM }));
+}
+
+export async function startRun(db: Db, kind: string): Promise<number> {
+  const [r] = await db.insert(scrapeRuns).values({ kind }).returning({ id: scrapeRuns.id });
+  return r!.id;
+}
+
+export async function finishRun(
+  db: Db,
+  id: number,
+  result: { ok: boolean; inserted: number; skipped: number; error?: string },
+): Promise<void> {
+  await db
+    .update(scrapeRuns)
+    .set({ ...result, error: result.error ?? null, finishedAt: new Date() })
+    .where(eq(scrapeRuns.id, id));
+}
+
+export type ScrapeRun = typeof scrapeRuns.$inferSelect;
+
+export async function getLastRuns(db: Db, n: number): Promise<ScrapeRun[]> {
+  return db.select().from(scrapeRuns).orderBy(desc(scrapeRuns.id)).limit(n);
+}
