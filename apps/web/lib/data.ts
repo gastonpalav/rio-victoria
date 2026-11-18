@@ -1,5 +1,5 @@
 import { cacheLife, cacheTag } from "next/cache";
-import { type Db, createDb, upstreamOf } from "@rio/core";
+import { type Db, createDb, getMaxSince, getStationBySlug, upstreamOf } from "@rio/core";
 import { buildReadingsPayload, buildStationsPayload } from "./api";
 
 export const READINGS_TAG = "readings";
@@ -42,7 +42,9 @@ export async function getStationPage(slug: string) {
   const to = now.toISOString();
   const from = new Date(now.getTime() - 7 * 86_400_000).toISOString();
   const r = await buildReadingsPayload(getDb(), slug, from, to, now);
+  const max = await getMaxSince(getDb(), (await getStationBySlug(getDb(), slug))?.id ?? -1, new Date(now.getTime() - 365 * 86_400_000));
   return {
+    yearMax: max ? { ts: max.ts.toISOString(), heightM: max.heightM } : null,
     station,
     upstream,
     options: stations.map((s) => ({ slug: s.slug, name: s.name, river: s.river })),
@@ -57,3 +59,4 @@ export function roundedNowIso(): string {
   const step = 5 * 60_000;
   return new Date(Math.floor(Date.now() / step) * step).toISOString();
 }
+

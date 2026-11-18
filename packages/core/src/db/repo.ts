@@ -140,3 +140,14 @@ export type ScrapeRun = typeof scrapeRuns.$inferSelect;
 export async function getLastRuns(db: Db, n: number): Promise<ScrapeRun[]> {
   return db.select().from(scrapeRuns).orderBy(desc(scrapeRuns.id)).limit(n);
 }
+
+/** La lectura más alta de una estación desde `since` (la más reciente si hay empate). */
+export async function getMaxSince(db: Db, stationId: number, since: Date): Promise<Point | null> {
+  const [r] = await db
+    .select({ ts: readings.ts, heightM: readings.heightM })
+    .from(readings)
+    .where(and(eq(readings.stationId, stationId), gte(readings.ts, since)))
+    .orderBy(desc(readings.heightM), desc(readings.ts))
+    .limit(1);
+  return r ? { ts: new Date(r.ts), heightM: r.heightM } : null;
+}

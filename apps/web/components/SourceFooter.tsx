@@ -1,7 +1,7 @@
 export function SourceFooter() {
   return (
-    <footer className="footer depth depth-3">
-      <div className="inner">
+    <footer className="footer">
+      <div>
       <p>
         Datos: <a href="https://contenidosweb.prefecturanaval.gob.ar/alturas/">Prefectura Naval Argentina</a>. Sitio no
         oficial, hecho en Victoria. Los niveles de alerta y evacuación son los que publica Prefectura; ante una

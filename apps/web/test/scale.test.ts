@@ -31,3 +31,20 @@ describe("heroScale: río muy por debajo de los niveles", () => {
     expect(s.alert!).toBeGreaterThan(s.level);
   });
 });
+
+describe("heroScale: con la serie del período", () => {
+  it("si el río estuvo más bajo en el período, la escala lo incluye", () => {
+    const s = heroScale(4.85, 4.6, 4.9, 2.0);
+    expect(s.pos(2.0)).toBeGreaterThan(0);
+    expect(s.level).toBeGreaterThan(s.pos(2.0));
+  });
+});
+
+describe("heroScale: lugar para el texto dentro del agua", () => {
+  it("el agua ocupa al menos el 40% aunque el río esté muy por debajo de los niveles", () => {
+    const s = heroScale(0.8, 2.2, 2.45, 0.2);
+    expect(s.level).toBeGreaterThanOrEqual(0.4);
+    expect(s.evacuation!).toBeLessThan(0.95);
+    expect(s.pos(0.2)).toBeGreaterThan(0);
+  });
+});

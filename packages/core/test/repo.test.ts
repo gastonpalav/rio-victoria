@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createTestDb } from "../src/testing";
 import {
-  upsertStations, upsertReadings, getStationBySlug, getStations, getSeries, startRun, finishRun, getLastRuns,
+  upsertStations, upsertReadings, getStationBySlug, getStations, getSeries, startRun, finishRun, getLastRuns, getMaxSince,
 } from "../src/db/repo";
 import type { Db } from "../src/db/client";
 import { currentRows } from "./helpers/rows";
@@ -80,5 +80,18 @@ describe("repo: lecturas duplicadas", () => {
     const n = await upsertReadings(db, 260, [{ ts: T, heightM: 4.84 }, { ts: T, heightM: 4.85 }], "tabla");
     expect(n).toBe(1);
     expect((await getSeries(db, 260, T0, T1))[0]!.heightM).toBeCloseTo(4.85);
+  });
+});
+
+describe("repo: máximo en un período", () => {
+  it("devuelve la lectura más alta desde una fecha, o null si no hay", async () => {
+    await upsertReadings(db, 260, [
+      { ts: new Date("2026-03-01T12:00:00Z"), heightM: 3.1 },
+      { ts: new Date("2026-11-18T17:00:00Z"), heightM: 4.84 },
+      { ts: new Date("2026-11-18T19:00:00Z"), heightM: 4.85 },
+      { ts: new Date("2025-06-01T12:00:00Z"), heightM: 5.5 },
+    ], "tabla");
+    expect(await getMaxSince(db, 260, new Date("2025-11-18T00:00:00Z"))).toEqual({ ts: new Date("2026-11-18T19:00:00Z"), heightM: 4.85 });
+    expect(await getMaxSince(db, 280, new Date("2025-11-18T00:00:00Z"))).toBeNull();
   });
 });

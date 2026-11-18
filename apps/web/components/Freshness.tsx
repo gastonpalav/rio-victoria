@@ -43,5 +43,5 @@ export function ReadingMeta({ ts, periodHours, initialStale, name }: Props) {
 
 export function StaleTag({ ts, periodHours, initialStale }: Omit<Props, "name">) {
   const stale = useStale(ts, periodHours, initialStale);
-  return stale ? <>, dato viejo</> : null;
+  return stale ? <>dato viejo</> : null;
 }

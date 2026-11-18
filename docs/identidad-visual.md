@@ -7,13 +7,16 @@ Maquetas: https://claude.ai/artifact/4HWv6SuTpxS6ettcNCXuNG (privado).
 
 La regla hidrométrica — la escala pintada con "E" negras sobre blanco que se ve en los muelles — es el objeto con el que la gente del río lee la altura. La pantalla principal **es** una regla: el agua (marrón, como el Paraná) llega hasta la altura actual y las líneas de alerta y evacuación están pintadas sobre la escala.
 
-## Rediseño (2026-11-18): la pantalla es la regla
+## Dirección actual: la pared de la costanera (2026-11-18, tercera vuelta)
 
-Pedido del autor: sacar lo genérico y hacerla vistosa. La regla dejó de ser un dibujo al costado:
+El autor rechazó dos versiones por verse "típicas de IA/Claude". Investigación: Reuters (Colorado River) usa la línea del agua como la propia gráfica; FlowingData destaca que una línea de agua animada vuelve los números menos abstractos; GOV.UK insiste en que una altura sin contexto histórico no dice nada. Y un rasgo del Litoral: las marcas de crecientes pintadas a mano en las paredes.
 
-- **Portada**: el cielo arriba; el agua marrón llena la pantalla desde abajo hasta la altura real (sube al cargar). La escala con las "E" va pintada sobre todo el borde izquierdo. Las líneas de alerta (punteada) y evacuación (continua) cruzan la pantalla de lado a lado. El número gigante flota sobre la superficie.
-- **Debajo**: secciones claras con el río como acento; "lo que viene de arriba" es una línea de río que baja hasta el puerto que mirás. El pie, azul marino.
-- La escala se estira si el río está muy por debajo de los niveles, para que siempre se vean el agua y las líneas (`lib/scale.ts`).
+- **La pantalla es una pared blanqueada a la cal** (grano sutil, `--wall` #E4E8E5), con la regla hidrométrica sobre el borde izquierdo.
+- **La superficie del agua es la serie real** del período elegido (7 días, 1 mes, 6 meses, 1 año): a la izquierda el río de antes, a la derecha el de hoy. No hay gráfica aparte ni olas decorativas.
+- **Marcas pintadas**: evacuación (roja, gruesa), alerta (ocre, punteada) y máximo del año (azul). La línea tiene trazo irregular (filtro SVG); **el texto nunca**, y va sobre fondo de cal por encima del número: una cifra de nivel no puede quedar ilegible.
+- **"Lo que viene de arriba"**: reglas chicas lado a lado alineadas en su línea de evacuación, para comparar de un vistazo.
+- **Tipografía**: Big Shoulders Stencil (lo pintado) + Atkinson Hyperlegible Next (texto, pensada para legibilidad).
+- Fuera: píldoras, timeline de puntitos, párrafos de relleno, olas, bloques de color en el pie, modo oscuro.
 
 ## Nombre
 
@@ -21,16 +24,11 @@ Pedido del autor: sacar lo genérico y hacerla vistosa. La regla dejó de ser un
 
 ## Color
 
-**Siempre en claro** (pedido del autor, 2026-11-18): no sigue el modo oscuro del sistema. Nada de crema ni terracota.
-
-- Cielo de día, degradé hacia el horizonte: `--sky-top` #9FD3EE → `--sky` #CFEAF7 → `--sky-horizon` #EEF8FD. Tinta azul marino `--sky-ink` #0B2233.
-- Agua café con leche del Paraná: `--river` #9A6B3E → `--river-2` #7E5530, texto `--on-river` #FFF8EE.
-- Secciones de abajo en blanco frío (`--paper` #F5FAFD, `--paper-2` #E7F1F7) con el río como acento; pie azul marino `--navy`.
-- Niveles: alerta ámbar (punteada), evacuación roja (continua), distintos también por trazo y texto.
+Siempre en claro. Cal fría `--wall` #E4E8E5, pintura azul marino `--paint` #12283A, agua café con leche `--river` #9C6E42 (superficie `--river-line` #5C3D20), evacuación `--evac-paint` #C0121F, alerta `--alert-paint` #A85F00. Sin crema ni terracota.
 
 ## Tipografía
 
-**Archivo** (Google Fonts, variable en ancho y peso). Números grandes y títulos en `font-stretch: 62–75%`, peso 800 — tipo cartel de muelle. Texto corrido en ancho normal, 400–600.
+Big Shoulders Stencil 800 para números, marcas y títulos; Atkinson Hyperlegible Next para el texto.
 
 ## Gráficas
 

@@ -1,39 +1,33 @@
 /* Identidad "regla" — ver docs/identidad-visual.md
-   Siempre en claro (decisión del autor): cielo de día arriba, el Paraná marrón abajo.
-   Sin crema ni terracota: fondos fríos, tinta azul marino, agua café con leche. */
+   Una pared de la costanera blanqueada a la cal, con las marcas de las crecientes pintadas.
+   Siempre en claro. Nada de crema ni terracota: cal fría, pintura azul marino, agua café con leche. */
 :root {
   color-scheme: light;
 
-  --sky-top: #9FD3EE;
-  --sky: #CFEAF7;
-  --sky-horizon: #EEF8FD;
-  --sky-ink: #0B2233;
-  --sky-muted: #3A5568;
-  --sky-line: #9DBCCC;
-  --alert-sky: #8A4B00;
-  --evac-sky: #B4101E;
+  --wall: #E4E8E5;
+  --wall-shade: #D3D9D6;
+  --paint: #12283A;
+  --paint-soft: #3D5263;
 
-  --river: #9A6B3E;
-  --river-2: #7E5530;
-  --on-river: #FFF8EE;
-  --on-river-muted: #F1DCC0;
+  --river: #9C6E42;
+  --river-deep: #7A532F;
+  --river-line: #5C3D20;
+  --on-river: #FFF8EF;
+  --on-river-soft: #F3E1C7;
 
-  --paper: #F5FAFD;
-  --paper-2: #E7F1F7;
-  --navy: #0B2233;
-  --on-navy: #DDEAF2;
+  --evac-paint: #C0121F;
+  --alert-paint: #A85F00;
 
   --staff: #FFFFFF;
-  --mark: #0B2233;
-  --sand: #C98A3D;
+  --mark: #12283A;
 
   /* nombres genéricos que usan los componentes */
-  --bg: var(--paper);
-  --ink: var(--sky-ink);
-  --muted: var(--sky-muted);
-  --line: #C9DCE6;
+  --bg: var(--wall);
+  --ink: var(--paint);
+  --muted: var(--paint-soft);
+  --line: #B9C3C0;
   --water: var(--river);
-  --alert: #C77700;
-  --evac: #C8102E;
-  --evac-text: #B4101E;
+  --alert: var(--alert-paint);
+  --evac: var(--evac-paint);
+  --evac-text: var(--evac-paint);
 }

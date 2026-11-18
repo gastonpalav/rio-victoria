@@ -1,9 +1,10 @@
 import type { Metadata, Viewport } from "next";
-import { Archivo } from "next/font/google";
+import { Atkinson_Hyperlegible_Next, Big_Shoulders_Stencil } from "next/font/google";
 import "../styles/tokens.css";
 import "./globals.css";
 
-const archivo = Archivo({ subsets: ["latin"], axes: ["wdth"], variable: "--font-archivo", display: "swap" });
+const body = Atkinson_Hyperlegible_Next({ subsets: ["latin"], variable: "--font-body", display: "swap" });
+const stencil = Big_Shoulders_Stencil({ subsets: ["latin"], variable: "--font-stencil", display: "swap" });
 
 export const metadata: Metadata = {
   metadataBase: new URL(
@@ -16,14 +17,13 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#F3F6F8" },
-    { media: "(prefers-color-scheme: dark)", color: "#0E161C" },
+    { color: "#E4E8E5" },
   ],
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es-AR" className={archivo.variable}>
+    <html lang="es-AR" className={`${body.variable} ${stencil.variable}`}>
       <body>{children}</body>
     </html>
   );

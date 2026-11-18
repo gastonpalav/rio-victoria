@@ -2,7 +2,6 @@ import { notFound } from "next/navigation";
 import { getStationPage } from "@/lib/data";
 import { Logo } from "./Logo";
 import { Hero } from "./Hero";
-import { HeightChart } from "./HeightChart";
 import { Upstream } from "./Upstream";
 import { StationPicker } from "./StationPicker";
 import { SourceFooter } from "./SourceFooter";
@@ -10,7 +9,7 @@ import { SourceFooter } from "./SourceFooter";
 export async function StationView({ slug }: { slug: string }) {
   const page = await getStationPage(slug);
   if (!page) notFound();
-  const { station, upstream, options, series, from, to } = page;
+  const { station, upstream, options, series, from, to, yearMax } = page;
   return (
     <div className="page">
       <header className="topbar">
@@ -21,20 +20,7 @@ export async function StationView({ slug }: { slug: string }) {
       </header>
       <main>
         <h1 className="sr-only">Altura del río en {station.name}</h1>
-        <Hero station={station} />
-        <section className="depth depth-1">
-          <div className="inner">
-            <HeightChart
-              key={station.slug}
-              slug={station.slug}
-              initial={series}
-              initialFrom={from}
-              to={to}
-              alertM={station.alertM}
-              evacuationM={station.evacuationM}
-            />
-          </div>
-        </section>
+        <Hero key={station.slug} station={station} series={series} from={from} to={to} yearMax={yearMax} />
         <Upstream stations={upstream} here={station} />
       </main>
       <SourceFooter />
