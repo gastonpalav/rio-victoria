@@ -5,6 +5,7 @@ import type { StationDto } from "@/lib/api";
 import { RANGES, rangeHeadline, type SeriesPoint } from "@/lib/chart";
 import { TREND_LABEL, changeSentence, fmtM, levelSentence } from "@/lib/copy";
 import { heroScale } from "@/lib/scale";
+import { buildSurface } from "@/lib/surface";
 import { ReadingMeta, StaleBanner } from "./Freshness";
 import { TrendIcon } from "./TrendIcon";
 
@@ -63,17 +64,15 @@ export function Hero({ station: s, series = [], from, to, yearMax = null }: Prop
   // La escala incluye lo más bajo del período para que la superficie no se salga de la pared.
   const lowest = Math.min(heightM, ...current.points.map((p) => p.heightM));
   const sc = heroScale(heightM, s.alertM, s.evacuationM, lowest);
-  const yOf = (h: number) => (1 - sc.pos(h)) * 1000;
-  const t0 = new Date(current.from).getTime();
-  const t1 = Math.max(new Date(end).getTime(), t0 + 1);
-  const pts = [...current.points, { ts, heightM }]
-    .map((p) => ({ x: ((new Date(p.ts).getTime() - t0) / (t1 - t0)) * 1000, y: yOf(p.heightM) }))
-    .filter((p) => p.x >= 0 && p.x <= 1000)
-    .sort((a, b) => a.x - b.x);
-  if (pts[0]!.x > 0) pts.unshift({ x: 0, y: pts[0]!.y });
-  if (pts.at(-1)!.x < 1000) pts.push({ x: 1000, y: pts.at(-1)!.y });
-  const surface = pts.map((p) => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(" ");
-  const water = `0,1000 ${surface} 1000,1000`;
+  const { surface, water } = buildSurface({
+    points: current.points,
+    from: current.from,
+    to: end,
+    now: { ts, heightM },
+    yOf: (h) => (1 - sc.pos(h)) * 1000,
+    width: 1000,
+    height: 1060, // el fondo sigue debajo de la pared: el vaivén no deja ver el borde
+  });
 
   const level = levelSentence(s);
   const change = changeSentence(s);
@@ -129,8 +128,29 @@ export function Hero({ station: s, series = [], from, to, yearMax = null }: Prop
         preserveAspectRatio="none"
         aria-hidden="true"
       >
-        <polygon points={water} className="river-body" />
-        <polyline points={surface} className="river-surface" vectorEffect="non-scaling-stroke" />
+        <defs>
+          {/* Más claro y verdoso arriba, donde pega la luz; cargado de sedimento abajo. */}
+          <linearGradient id="agua-color" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor="var(--river-top)" />
+            <stop offset="0.35" stopColor="var(--river)" />
+            <stop offset="1" stopColor="var(--river-deep)" />
+          </linearGradient>
+          {/* Vetas de corriente: se repiten cada 240 unidades y corren con el río. */}
+          <pattern id="corriente" width="240" height="90" patternUnits="userSpaceOnUse">
+            <path d="M10 18h70M120 46h90M40 74h50M170 82h40" className="river-streak" />
+          </pattern>
+          <clipPath id="agua-forma">
+            <polygon points={water} />
+          </clipPath>
+        </defs>
+        <g className="river-bob">
+          <polygon points={water} className="river-body" />
+          <g clipPath="url(#agua-forma)">
+            <rect x="-240" y="0" width="1480" height="1000" fill="url(#corriente)" className="river-current" />
+          </g>
+          <polyline points={surface} className="river-surface" vectorEffect="non-scaling-stroke" />
+          <polyline points={surface} className="river-glint" vectorEffect="non-scaling-stroke" />
+        </g>
       </svg>
 
       {sc.evacuation !== null && s.evacuationM !== null && (

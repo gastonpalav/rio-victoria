@@ -156,15 +156,17 @@ a {
   width: 100%;
   height: 100%;
   z-index: 2;
+  overflow: visible;
   animation: fill-in 1.6s cubic-bezier(0.3, 0.7, 0.2, 1) both;
   transition: opacity 0.2s;
 }
 .river-loading {
   opacity: 0.6;
 }
+/* Agua un poco traslúcida: la regla se adivina debajo, como en la costa. */
 .river-body {
-  fill: var(--river);
-  opacity: 0.93;
+  fill: url(#agua-color);
+  opacity: 0.9;
 }
 .river-surface {
   fill: none;
@@ -172,12 +174,54 @@ a {
   stroke-width: 3;
   stroke-linejoin: round;
 }
+/* Brillos que corren por la superficie */
+.river-glint {
+  fill: none;
+  stroke: var(--river-glint);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-dasharray: 3 46 14 90 6 130;
+  animation: glint 7s linear infinite;
+}
+.river-streak {
+  fill: none;
+  stroke: var(--river-glint);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  opacity: 0.22;
+}
+.river-current {
+  animation: current 14s linear infinite;
+}
+/* El agua respira: sube y baja apenas, como la marea de una costa con viento. */
+.river-bob {
+  animation: bob 6s ease-in-out infinite;
+}
 @keyframes fill-in {
   from {
     clip-path: inset(0 100% 0 0);
   }
   to {
     clip-path: inset(0 0 0 0);
+  }
+}
+@keyframes glint {
+  to {
+    stroke-dashoffset: -289;
+  }
+}
+@keyframes current {
+  to {
+    transform: translateX(240px);
+  }
+}
+@keyframes bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(5px);
   }
 }
 
@@ -465,7 +509,10 @@ a.staff-cell:hover .staff-name {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .river {
+  .river,
+  .river-glint,
+  .river-current,
+  .river-bob {
     animation: none;
     transition: none;
   }
