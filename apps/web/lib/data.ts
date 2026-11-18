@@ -1,0 +1,33 @@
+import { cacheLife, cacheTag } from "next/cache";
+import { type Db, createDb } from "@rio/core";
+import { buildReadingsPayload, buildStationsPayload } from "./api";
+
+export const READINGS_TAG = "readings";
+
+let db: Db | undefined;
+export function getDb(): Db {
+  const url = process.env.DATABASE_URL;
+  if (!url) throw new Error("Falta DATABASE_URL");
+  return (db ??= createDb(url, { max: 3 }));
+}
+
+/** Estaciones con su última lectura. Caché de 5 min; la ruta de scrape la invalida al guardar. */
+export async function getStationsData() {
+  "use cache";
+  cacheLife({ stale: 60, revalidate: 300, expire: 86_400 });
+  cacheTag(READINGS_TAG);
+  return buildStationsPayload(getDb(), new Date());
+}
+
+export async function getReadingsData(slug: string, from: string | null, to: string | null, nowIso: string) {
+  "use cache";
+  cacheLife({ stale: 60, revalidate: 300, expire: 86_400 });
+  cacheTag(READINGS_TAG, `readings-${slug}`);
+  return buildReadingsPayload(getDb(), slug, from, to, new Date(nowIso));
+}
+
+/** "Ahora" redondeado a 5 minutos, para que la caché se comparta entre pedidos. */
+export function roundedNowIso(): string {
+  const step = 5 * 60_000;
+  return new Date(Math.floor(Date.now() / step) * step).toISOString();
+}

@@ -1,9 +1,17 @@
 {
   "name": "rio-victoria",
   "private": true,
-  "workspaces": ["packages/*", "apps/*"],
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
   "scripts": {
     "test": "npm run test --workspaces --if-present",
-    "typecheck": "npm run typecheck --workspaces --if-present"
-  }
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "start": "tsx apps/scraper/src/main.ts"
+  },
+  "engines": {
+    "node": "24.x"
+  },
+  "packageManager": "npm@11.4.2"
 }
