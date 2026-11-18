@@ -47,7 +47,7 @@ a {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 14px 16px 0 56px;
+  padding: 14px 16px 0 70px;
 }
 .home {
   text-decoration: none;
@@ -110,7 +110,7 @@ a {
 .river-hero-empty {
   display: flex;
   align-items: center;
-  padding: 0 24px 0 56px;
+  padding: 0 24px 0 72px;
   font-size: 20px;
   height: 70svh;
 }
@@ -118,7 +118,7 @@ a {
 .staff {
   position: absolute;
   inset: 0 auto 0 0;
-  width: 40px;
+  width: 58px;
   z-index: 1;
 }
 .staff svg {
@@ -134,12 +134,12 @@ a {
 }
 .staff-label {
   position: absolute;
-  left: 46px;
+  left: 34px;
   transform: translateY(50%);
-  font-size: 12px;
-  font-weight: 800;
-  font-stretch: 75%;
-  color: var(--sky-muted);
+  font-size: 11px;
+  font-weight: 900;
+  font-stretch: 62%;
+  color: var(--mark);
   font-variant-numeric: tabular-nums;
 }
 
@@ -182,7 +182,7 @@ a {
 .water-text {
   position: absolute;
   bottom: max(28px, env(safe-area-inset-bottom));
-  left: 56px;
+  left: 72px;
   right: 18px;
   color: var(--on-river);
   display: flex;
@@ -212,7 +212,7 @@ a {
 
 .threshold {
   position: absolute;
-  left: 40px;
+  left: 58px;
   right: 0;
   z-index: 4;
   height: 0;
@@ -244,7 +244,7 @@ a {
 
 .reading {
   position: absolute;
-  left: 52px;
+  left: 68px;
   right: 12px;
   bottom: calc(var(--level) * 100% + 10px);
   z-index: 3;
@@ -303,7 +303,7 @@ a {
 .inner {
   max-width: 640px;
   margin: 0 auto;
-  padding: 36px 16px 40px 56px;
+  padding: 36px 16px 40px 72px;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -489,7 +489,7 @@ a {
 @media (min-width: 900px) {
   .reading,
   .water-text {
-    left: max(56px, calc(50vw - 380px));
+    left: max(72px, calc(50vw - 380px));
   }
 }
 

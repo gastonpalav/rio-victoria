@@ -46,8 +46,8 @@ export function Hero({ station: s }: { station: StationDto }) {
   return (
     <section className="river-hero" style={vars}>
       <div className="staff" role="img" aria-label={`Regla: el agua marca ${fmtM(s.heightM)} metros en ${s.name}.${s.alertM !== null && s.evacuationM !== null ? ` Nivel de alerta ${fmtM(s.alertM)}, nivel de evacuación ${fmtM(s.evacuationM)}.` : ""}`}>
-        <svg viewBox={`0 0 40 ${sc.span * 100}`} preserveAspectRatio="none" aria-hidden="true">
-          <rect x={0} y={0} width={40} height={sc.span * 100} className="staff-enamel" />
+        <svg viewBox={`0 0 58 ${sc.span * 100}`} preserveAspectRatio="none" aria-hidden="true">
+          <rect x={0} y={0} width={58} height={sc.span * 100} className="staff-enamel" />
           <g className="staff-marks">{marks}</g>
         </svg>
         {labels}
