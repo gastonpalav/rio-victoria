@@ -1,0 +1,9 @@
+{
+  "$schema": "https://railway.com/railway.schema.json",
+  "build": { "builder": "RAILPACK" },
+  "deploy": {
+    "startCommand": "npx tsx apps/scraper/src/main.ts",
+    "cronSchedule": "*/30 * * * *",
+    "restartPolicyType": "NEVER"
+  }
+}

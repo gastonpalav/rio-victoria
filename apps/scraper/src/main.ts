@@ -3,7 +3,7 @@ import { migrateDb } from "@rio/core/migrate";
 import { fetchPrefectura, PREFECTURA_BASE } from "./fetch";
 import { runBackfill, runScrape } from "./jobs";
 
-const mode = process.argv[2] ?? "scrape";
+const mode = process.argv[2] ?? process.env.SCRAPER_MODE ?? "scrape";
 
 async function main() {
   if (mode === "probe") {
