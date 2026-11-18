@@ -20,6 +20,7 @@ La regla hidrométrica — la escala pintada con "E" negras sobre blanco que se 
 | `--muted` | `#4F5E69` | `#9DABB5` | texto secundario (≥ 4.5:1) |
 | `--line` | `#D3DCE2` | `#2A3A45` | divisores, bordes |
 | `--staff` | `#FFFFFF` | `#E6ECEF` | esmalte de la regla |
+| `--mark` | `#14212B` | `#0E161C` | marcas "E" de la regla (siempre oscuras) |
 | `--water` | `#8B6640` | `#A67E52` | agua del Paraná, gráficas |
 | `--alert` | `#B86E00` | `#F0A23B` | nivel de alerta (línea **punteada**) |
 | `--evac` | `#C2182B` | `#FF5D6C` | nivel de evacuación (línea **continua**) |
