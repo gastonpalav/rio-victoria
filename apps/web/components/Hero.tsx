@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 import { formatArt } from "@rio/core/pure";
 import type { StationDto } from "@/lib/api";
 import { RANGES, rangeHeadline, type SeriesPoint } from "@/lib/chart";
@@ -29,6 +29,28 @@ export function Hero({ station: s, series = [], from, to, yearMax = null }: Prop
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const inflight = useRef(new Map<string, Promise<boolean>>());
+  const wallRef = useRef<HTMLElement>(null);
+  const textRef = useRef<HTMLDivElement>(null);
+  // Rótulos de nivel que, en esta pantalla, quedarían encima del texto del agua (río muy alto): se ocultan
+  // (sin dejar de ocupar lugar, así la medición no oscila) y sus valores se escriben en el agua.
+  const [covered, setCovered] = useState<string[]>([]);
+  useLayoutEffect(() => {
+    const check = () => {
+      const text = textRef.current?.getBoundingClientRect();
+      const wall = wallRef.current;
+      if (!text || !wall) return;
+      const hit = [...wall.querySelectorAll<HTMLElement>("[data-level-label]")]
+        .filter((el) => {
+          const r = el.getBoundingClientRect();
+          return r.bottom > text.top - 6 && r.top < text.bottom && r.right > text.left && r.left < text.right;
+        })
+        .map((el) => el.dataset.levelLabel!);
+      setCovered((prev) => (prev.join("|") === hit.join("|") ? prev : hit));
+    };
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  });
   const end = to ?? s.ts ?? "";
 
   /** Trae un período. `from` va redondeado al día: la misma URL para todos → la sirve la caché de Vercel. */
@@ -107,6 +129,10 @@ export function Hero({ station: s, series = [], from, to, yearMax = null }: Prop
   const shownRange = cache[range.key] ? range : RANGES[0]!;
   const headline = current.points.length ? rangeHeadline(current.points, shownRange) : null;
   const showMax = yearMax !== null && Math.abs(yearMax.heightM - heightM) >= 0.02;
+  // En el celular, justo encima del agua está el número grande: si la línea del máximo cae ahí, su rótulo quedaría
+  // detrás de la cifra. En ese caso (solo en pantallas angostas) el dato va escrito en el agua.
+  const maxBehindNumber = showMax && sc.pos(yearMax.heightM) > sc.level && sc.pos(yearMax.heightM) - sc.level < 0.32;
+  const maxText = yearMax ? `Máximo del año ${fmtM(yearMax.heightM)}, ${formatArt(new Date(yearMax.ts)).split(" ")[0]}` : "";
 
   const marks = [];
   const labels = [];
@@ -130,14 +156,7 @@ export function Hero({ station: s, series = [], from, to, yearMax = null }: Prop
   }
 
   return (
-    <section className="wall" style={{ "--level": sc.level } as CSSProperties}>
-      <svg className="paint-filter" aria-hidden="true" width="0" height="0">
-        <filter id="pintado">
-          <feTurbulence type="fractalNoise" baseFrequency="0.03 0.5" numOctaves="2" seed="7" />
-          <feDisplacementMap in="SourceGraphic" scale="3" />
-        </filter>
-      </svg>
-
+    <section className="wall" ref={wallRef} style={{ "--level": sc.level } as CSSProperties}>
       <div
         className="staff"
         role="img"
@@ -164,8 +183,12 @@ export function Hero({ station: s, series = [], from, to, yearMax = null }: Prop
             <stop offset="1" stopColor="var(--river-deep)" />
           </linearGradient>
           {/* Vetas de corriente: se repiten cada 240 unidades y corren con el río. */}
-          <pattern id="corriente" width="240" height="90" patternUnits="userSpaceOnUse">
-            <path d="M10 18h70M120 46h90M40 74h50M170 82h40" className="river-streak" />
+          {/* Vetas largas y desparejas en un módulo grande: que no se lea la grilla del patrón. */}
+          <pattern id="corriente" width="720" height="260" patternUnits="userSpaceOnUse">
+            <path
+              d="M14 22h150M300 58h62M470 31h190M90 104h44M228 127h170M560 150h80M30 188h120M352 205h36M430 236h210M650 92h50"
+              className="river-streak"
+            />
           </pattern>
           <clipPath id="agua-forma">
             <polygon points={water} />
@@ -174,7 +197,7 @@ export function Hero({ station: s, series = [], from, to, yearMax = null }: Prop
         <g className="river-bob">
           <polygon points={water} className="river-body" />
           <g clipPath="url(#agua-forma)">
-            <rect x="-240" y="0" width="1480" height="1000" fill="url(#corriente)" className="river-current" />
+            <rect x="-720" y="0" width="2440" height="1000" fill="url(#corriente)" className="river-current" />
           </g>
           <polyline points={surface} className="river-surface" vectorEffect="non-scaling-stroke" />
           <polyline points={surface} className="river-glint" vectorEffect="non-scaling-stroke" />
@@ -183,19 +206,21 @@ export function Hero({ station: s, series = [], from, to, yearMax = null }: Prop
 
       {sc.evacuation !== null && s.evacuationM !== null && (
         <div className="threshold threshold-evac" style={{ bottom: `${sc.evacuation * 100}%` }}>
-          <span>Evacuación {fmtM(s.evacuationM)}</span>
+          <span data-level-label={`evacuación ${fmtM(s.evacuationM)}`} className={covered.includes(`evacuación ${fmtM(s.evacuationM)}`) ? "covered" : undefined}>
+            Evacuación {fmtM(s.evacuationM)}
+          </span>
         </div>
       )}
       {sc.alert !== null && s.alertM !== null && (
         <div className="threshold threshold-alert" style={{ bottom: `${sc.alert * 100}%` }}>
-          <span>Alerta {fmtM(s.alertM)}</span>
+          <span data-level-label={`alerta ${fmtM(s.alertM)}`} className={covered.includes(`alerta ${fmtM(s.alertM)}`) ? "covered" : undefined}>
+            Alerta {fmtM(s.alertM)}
+          </span>
         </div>
       )}
       {showMax && (
         <div className="threshold threshold-max" style={{ bottom: `${sc.pos(yearMax.heightM) * 100}%` }}>
-          <span>
-            Máximo del año {fmtM(yearMax.heightM)}, {formatArt(new Date(yearMax.ts)).split(" ")[0]}
-          </span>
+          <span className={maxBehindNumber ? "only-wide" : undefined}>{maxText}</span>
         </div>
       )}
 
@@ -205,7 +230,7 @@ export function Hero({ station: s, series = [], from, to, yearMax = null }: Prop
         <span className="big-number">{fmtM(heightM)}</span>
       </div>
 
-      <div className="water-text">
+      <div className="water-text" ref={textRef}>
         {headline && <p className="headline">{headline}</p>}
         {s.trend && (
           <div className="trend">
@@ -214,6 +239,8 @@ export function Hero({ station: s, series = [], from, to, yearMax = null }: Prop
           </div>
         )}
         {(change || level) && <p className="sentence">{[change, level].filter(Boolean).join(" ")}</p>}
+        {covered.length > 0 && <p className="meta">Bajo el agua, las líneas de Prefectura: {covered.join(" y ")}.</p>}
+        {maxBehindNumber && <p className="meta only-narrow">{maxText} (la línea azul).</p>}
         <ReadingMeta ts={ts} periodHours={s.periodHours} initialStale={s.stale} name={s.name} />
         {from && (
           <div className="range" role="group" aria-label="Período que muestra la superficie del agua">

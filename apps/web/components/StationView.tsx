@@ -29,7 +29,7 @@ export async function StationView({ slug }: { slug: string }) {
         <Hero key={station.slug} station={station} series={series} from={from} to={to} yearMax={yearMax} />
         <WindBand wind={wind} name={station.name} />
         <Upstream stations={upstream} here={station} travel={travel} />
-        <YearFacts rate={rate} daysAboveAlert={daysAboveAlert} lastYearM={lastYearM} nowM={station.heightM} />
+        <YearFacts rate={rate} daysAboveAlert={daysAboveAlert} lastYearM={lastYearM} nowM={station.heightM} alertM={station.alertM} evacuationM={station.evacuationM} />
       </main>
       <SourceFooter />
     </div>

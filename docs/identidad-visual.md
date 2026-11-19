@@ -18,6 +18,18 @@ El autor rechazó dos versiones por verse "típicas de IA/Claude". Investigació
 - **Tipografía**: Big Shoulders Stencil (lo pintado) + Atkinson Hyperlegible Next (texto, pensada para legibilidad).
 - Fuera: píldoras, timeline de puntitos, párrafos de relleno, olas, bloques de color en el pie, modo oscuro.
 
+## Cuarta vuelta: la pared sigue debajo del agua (2026-11-19)
+
+Auditoría "¿parece hecho con IA?": la pared estaba bien; lo genérico era todo lo de abajo (una columna de 720 px con título stencil, párrafo gris y contenido, repetida tres veces) y algunos detalles del agua.
+
+- **Lo que viene de arriba**: las reglas van pegadas y el agua ocupa todo el ancho de cada columna, así el río forma un perfil escalonado de puerto en puerto, cortado por **una sola línea roja** (la evacuación de cada uno, alineada). Debajo: nombre, altura, diferencia corta ("+71 cm sobre evacuación") y días de viaje. "ACÁ" es un cartelito pintado sobre la regla propia.
+- **Para comparar** son **marcas de creciente** pintadas a su altura real: HOY, HACE UN AÑO y ALERTA, con la diferencia escrita a lo largo de una flecha de medida. La escala se estira para que ningún rótulo pise la línea siguiente.
+- **Viento**: una manga de viento vista desde arriba (norte arriba, apunta hacia donde sopla, se infla con la velocidad). Con sudestada la franja se pinta de ocre.
+- **Pie**: "hecho en Victoria" pintado en stencil grande, sobre una franja azul marino.
+- Todo lo de abajo va alineado a la izquierda con un margen propio (`--gutter`), a todo el ancho; nada de columna centrada.
+- **Agua**: fuera el filtro de pincel (se veía como serrucho) y el grano de la cal (invisible). Vetas de corriente en un módulo grande para que no se lea la grilla. La cifra grande queda por delante de las líneas; los rótulos por delante de la cifra.
+- **Río muy alto**: si un rótulo de nivel quedaría encima del texto del agua, se oculta (se mide en el navegador) y su valor se escribe en el agua. Lo mismo con el máximo del año en celular cuando cae detrás de la cifra.
+
 ## Nombre
 
 **regla** (minúsculas). Se lee "la regla marca 4,85".

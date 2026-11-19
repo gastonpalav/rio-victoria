@@ -38,3 +38,26 @@ describe("lastYearText", () => {
     expect(lastYearText(4.85, 4.85)).toEqual({ figure: "4,85 m", rest: "marcaba hace un año, igual que hoy." });
   });
 });
+
+import { travelShort, upstreamDelta } from "@/lib/copy";
+
+describe("travelShort", () => {
+  it("entra en una columna de celular", () => {
+    expect(travelShort({ minDays: 4, maxDays: 6 })).toBe("4 a 6 días");
+    expect(travelShort({ minDays: 3, maxDays: 3 })).toBe("unos 3 días");
+    expect(travelShort({ minDays: 0, maxDays: 1 })).toBe("1 día o menos");
+    expect(travelShort({ minDays: 0, maxDays: 3 })).toBe("hasta 3 días");
+  });
+});
+
+describe("upstreamDelta", () => {
+  const lv = { alertM: 4.7, evacuationM: 5.0 };
+  it("sobre evacuación, sobre alerta o bajo alerta", () => {
+    expect(upstreamDelta({ ...lv, heightM: 5.71 })).toEqual({ figure: "+71 cm", label: "sobre evacuación", tone: "evac" });
+    expect(upstreamDelta({ ...lv, heightM: 4.8 })).toEqual({ figure: "+10 cm", label: "sobre alerta", tone: "alert" });
+    expect(upstreamDelta({ ...lv, heightM: 3.3 })).toEqual({ figure: "−1,40 m", label: "bajo alerta", tone: "ok" });
+  });
+  it("sin umbrales no dice nada", () => {
+    expect(upstreamDelta({ heightM: 3, alertM: null, evacuationM: null })).toBeNull();
+  });
+});

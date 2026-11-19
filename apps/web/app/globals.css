@@ -6,18 +6,18 @@
 
 html {
   -webkit-text-size-adjust: 100%;
+  overflow-x: clip;
   background: var(--wall);
 }
 
-/* La cal: un grano apenas visible para que no sea un plano de color de pantalla. */
 body {
   margin: 0;
+  overflow-x: clip;
   color: var(--paint);
   font-family: var(--font-body), system-ui, sans-serif;
   font-size: 17px;
   line-height: 1.45;
   background-color: var(--wall);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.15 0 0 0 0 0.2 0 0 0 0.07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 a {
@@ -39,10 +39,6 @@ a {
   overflow: hidden;
   clip: rect(0 0 0 0);
   white-space: nowrap;
-}
-
-.paint-filter {
-  position: absolute;
 }
 
 /* ---------- Arriba ---------- */
@@ -191,7 +187,7 @@ a {
   opacity: 0.22;
 }
 .river-current {
-  animation: current 14s linear infinite;
+  animation: current 42s linear infinite;
 }
 /* El agua respira: sube y baja apenas, como la marea de una costa con viento. */
 .river-bob {
@@ -212,7 +208,7 @@ a {
 }
 @keyframes current {
   to {
-    transform: translateX(240px);
+    transform: translateX(720px);
   }
 }
 @keyframes bob {
@@ -230,20 +226,19 @@ a {
   position: absolute;
   left: 58px;
   right: 0;
-  z-index: 5;
   height: 0;
   pointer-events: none;
 }
-/* Solo la línea lleva el trazo imperfecto: el texto queda nítido (un 4,60 no puede leerse como 4,80). */
 .threshold::before {
   content: "";
   position: absolute;
+  z-index: 5; /* la línea pasa por detrás del número grande */
   inset: 0 0 auto 0;
-  filter: url(#pintado);
 }
 /* Las cifras de los niveles nunca quedan tapadas: van por encima del número, con fondo de cal. */
 .threshold span {
   position: absolute;
+  z-index: 7; /* el rótulo, en cambio, nunca queda tapado */
   left: 8px;
   top: 7px;
   padding: 0 5px;
@@ -254,6 +249,9 @@ a {
   letter-spacing: 0.03em;
   text-transform: uppercase;
   white-space: nowrap;
+}
+.threshold span.covered {
+  visibility: hidden;
 }
 .threshold-evac::before {
   border-top: 5px solid var(--evac-paint);
@@ -280,7 +278,7 @@ a {
   position: absolute;
   right: 14px;
   bottom: calc(var(--level) * 100% + 4px);
-  z-index: 4;
+  z-index: 6; /* por encima de las marcas: la cifra nunca queda tachada por una línea */
   display: flex;
   flex-direction: column;
   align-items: flex-end;
@@ -316,7 +314,7 @@ a {
   left: 72px;
   right: 16px;
   bottom: max(24px, env(safe-area-inset-bottom));
-  z-index: 4;
+  z-index: 8; /* por encima de las líneas que quedan bajo el agua */
   color: var(--on-river);
   display: flex;
   flex-direction: column;
@@ -371,156 +369,324 @@ a {
   font-weight: 700;
 }
 
-/* ---------- Las reglas de arriba ---------- */
-.upstream {
-  max-width: 720px;
-  margin: 0 auto;
-  padding: 44px 16px 24px;
-}
-.upstream h2,
-.page-simple h1 {
-  margin: 0;
-  font-family: var(--font-stencil), sans-serif;
-  font-size: clamp(40px, 12vw, 64px);
-  font-weight: 800;
-  line-height: 0.92;
-}
-.upstream-note {
-  margin: 10px 0 0;
-  max-width: 46ch;
-  color: var(--paint-soft);
-  font-size: 15px;
-}
-.staffs {
-  list-style: none;
-  margin: 28px 0 0;
-  padding: 0;
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(0, 1fr);
-  gap: 6px;
-}
-.staff-cell {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  text-decoration: none;
-  text-align: center;
-}
-a.staff-cell:hover .staff-name {
-  text-decoration: underline;
-}
-.mini {
-  margin-bottom: 6px;
-}
-.mini-water {
-  fill: var(--river);
-  opacity: 0.93;
-}
-.mini-evac {
-  stroke: var(--evac-paint);
-  stroke-width: 4;
-}
-.mini-alert {
-  stroke: var(--alert-paint);
-  stroke-width: 3;
-  stroke-dasharray: 5 3;
-}
-.mini-here .staff-enamel {
-  stroke: var(--paint);
-  stroke-width: 3;
-}
-.staff-name {
-  font-weight: 700;
-  font-size: 15px;
-}
-.staff-value {
-  font-family: var(--font-stencil), sans-serif;
-  font-size: 34px;
-  font-weight: 800;
-  line-height: 1;
-}
-.staff-note {
-  font-size: 13px;
-  color: var(--paint-soft);
-  line-height: 1.25;
-}
-.staff-travel {
-  font-size: 13px;
-  font-weight: 700;
-  line-height: 1.2;
-  color: var(--river-line);
-}
-.staff-note-over {
-  color: var(--evac-paint);
-  font-weight: 700;
+/* ---------- Debajo de la pared: la misma pared sigue, a todo el ancho ---------- */
+.upstream,
+.wind,
+.year,
+.footer {
+  padding-left: var(--gutter);
+  padding-right: var(--gutter);
 }
 
-/* ---------- El viento ---------- */
+/* ---------- El viento: una manga de viento vista desde arriba ---------- */
 .wind {
-  max-width: 720px;
-  margin: 0 auto;
-  padding: 22px 16px 0;
   display: flex;
   align-items: center;
-  gap: 14px;
-  font-size: 17px;
+  gap: 16px;
+  padding-top: 26px;
+  padding-bottom: 6px;
+  font-size: 18px;
+  line-height: 1.35;
 }
 .wind p {
   margin: 0;
-  max-width: 52ch;
+  max-width: 48ch;
 }
-.wind-arrow {
+.windsock {
   flex: none;
+}
+.sock-ring {
+  fill: none;
+  stroke: var(--paint);
+  stroke-width: 1.5;
+  stroke-dasharray: 2 5;
+}
+.sock-n {
+  fill: var(--paint);
+  font: 800 13px var(--font-stencil), sans-serif;
+  text-anchor: middle;
+}
+.sock-red {
+  fill: var(--evac-paint);
+}
+.sock-white {
+  fill: var(--staff);
+  stroke: var(--evac-paint);
+  stroke-width: 0.6;
+}
+.sock-ring-hoop,
+.sock-pole {
   fill: var(--paint);
 }
-.wind-sudestada .wind-arrow {
-  fill: var(--alert-paint);
+.wind-sudestada {
+  margin-top: 14px;
+  padding-top: 14px;
+  padding-bottom: 14px;
+  background: var(--alert-wash);
+  box-shadow: inset 6px 0 0 var(--alert-paint);
 }
 .wind-sudestada p {
   font-weight: 700;
 }
 
-/* ---------- El último año ---------- */
-.year {
-  max-width: 720px;
-  margin: 0 auto;
-  padding: 36px 16px 8px;
+/* ---------- Las reglas de arriba ---------- */
+.upstream {
+  padding-top: 56px;
+  padding-bottom: 12px;
 }
-.year h2 {
+.upstream h2,
+.year h2,
+.page-simple h1 {
   margin: 0;
   font-family: var(--font-stencil), sans-serif;
-  font-size: clamp(40px, 12vw, 64px);
+  font-size: clamp(46px, 13vw, 104px);
   font-weight: 800;
-  line-height: 0.92;
+  line-height: 0.88;
+  overflow-wrap: anywhere;
 }
-.facts {
+.upstream-note {
+  margin: 12px 0 0;
+  max-width: 44ch;
+  color: var(--paint-soft);
+  font-size: 15px;
+}
+.staffs-wrap {
+  margin-top: 22px;
+  overflow-x: auto;
+}
+.staffs {
+  position: relative;
   list-style: none;
-  margin: 18px 0 0;
-  padding: 0;
+  margin: 0;
+  padding: 30px 0 0;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(60px, 1fr);
+  max-width: 980px;
+}
+/* Una sola línea roja de punta a punta: las reglas están alineadas en su evacuación. */
+.staffs::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(30px + var(--evac-y) - 2px);
+  height: 5px;
+  background: var(--evac-paint);
+  pointer-events: none;
+}
+.staffs li {
+  position: relative;
+  min-width: 0;
+}
+.staff-cell {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  font-size: 18px;
-  line-height: 1.3;
+  align-items: center;
+  gap: 2px;
+  text-decoration: none;
+  text-align: center;
+  padding-bottom: 6px;
 }
-.facts li {
-  max-width: 34ch;
+a.staff-cell:hover .staff-name {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
 }
-.fact-figure {
+.mini {
+  display: block;
+  width: 100%;
+  height: var(--staff-h);
+  margin-bottom: 10px;
+}
+.mini-water {
+  fill: var(--river);
+  opacity: 0.74;
+}
+.mini-surface {
+  fill: var(--river-line);
+}
+.mini-alert {
+  stroke: var(--alert-paint);
+  stroke-width: 3;
+  stroke-dasharray: 6 4;
+}
+.staff-name {
+  font-weight: 700;
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+.staff-value {
   font-family: var(--font-stencil), sans-serif;
-  font-size: 46px;
+  font-size: clamp(28px, 8vw, 48px);
   font-weight: 800;
-  line-height: 0.9;
-  vertical-align: -0.12em;
+  line-height: 0.95;
+}
+.staff-delta {
+  font-size: 11px;
+  line-height: 1.15;
+  font-weight: 700;
+}
+.staff-delta b {
+  display: block;
+  font-family: var(--font-stencil), sans-serif;
+  font-size: 19px;
+  font-weight: 800;
+  line-height: 1;
+}
+.staff-delta-evac {
+  color: var(--evac-paint);
+}
+.staff-delta-alert {
+  color: var(--alert-paint);
+}
+.staff-delta-ok {
+  color: var(--paint-soft);
+}
+.staff-travel {
+  margin-top: 4px;
+  padding-top: 4px;
+  border-top: 2px solid var(--river-line);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--river-line);
+}
+.staff-stale {
+  font-size: 12px;
+  color: var(--paint-soft);
+}
+.here-tag {
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 2px 7px 1px;
+  background: var(--paint);
+  color: var(--wall);
+  font: 800 15px var(--font-stencil), sans-serif;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.here-tag::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -6px;
+  margin-left: -6px;
+  border: 6px solid transparent;
+  border-bottom: 0;
+  border-top-color: var(--paint);
+}
+.staff-here .staff-name,
+.staff-here .staff-value {
+  color: var(--paint);
 }
 
-/* ---------- Pie ---------- */
+/* ---------- Para comparar: marcas de crecientes pintadas en la pared ---------- */
+.year {
+  padding-top: 56px;
+  padding-bottom: 8px;
+}
+.marks {
+  position: relative;
+  margin-top: 34px;
+  max-width: 980px;
+}
+.mark-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 0;
+}
+.mark-now .mark-line {
+  border-top: 6px solid var(--paint);
+  margin-top: -3px;
+}
+.mark-year .mark-line {
+  border-top: 3px solid var(--paint);
+  margin-top: -1.5px;
+  right: 22%;
+}
+.mark-alert .mark-line {
+  border-top: 4px dashed var(--alert-paint);
+  margin-top: -2px;
+}
+.mark-label {
+  position: absolute;
+  left: 0;
+  margin: 0;
+  max-width: calc(100% - 64px);
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.mark-title {
+  font-family: var(--font-stencil), sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+.mark-detail {
+  font-size: 15px;
+  line-height: 1.25;
+}
+.mark-now .mark-title {
+  font-size: 32px;
+}
+.mark-alert .mark-title {
+  color: var(--alert-paint);
+}
+.marks-gap {
+  position: absolute;
+  right: 44px;
+  width: 0;
+  border-left: 3px solid var(--paint);
+}
+.marks-gap::before,
+.marks-gap::after {
+  content: "";
+  position: absolute;
+  left: -8.5px;
+  border: 7px solid transparent;
+}
+.marks-gap::before {
+  top: 0;
+  border-top: 0;
+  border-bottom: 11px solid var(--paint);
+}
+.marks-gap::after {
+  bottom: 0;
+  border-bottom: 0;
+  border-top: 11px solid var(--paint);
+}
+/* La diferencia va escrita a lo largo de la flecha, como se pinta una medida en obra. */
+.marks-gap span {
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  writing-mode: vertical-rl;
+  padding: 4px 0;
+  background: var(--wall);
+  font: 800 30px var(--font-stencil), sans-serif;
+  white-space: nowrap;
+}
+.marks-extra {
+  margin: 16px 0 0;
+  font-size: 15px;
+}
+
+/* ---------- Pie: el cartel pintado ---------- */
 .footer {
-  max-width: 720px;
-  margin: 0 auto;
-  padding: 28px 16px 48px;
+  margin-top: 56px;
+  padding-top: 28px;
+  padding-bottom: 48px;
+  border-top: 6px solid var(--paint);
   font-size: 14px;
   color: var(--paint-soft);
 }
@@ -528,12 +694,27 @@ a.staff-cell:hover .staff-name {
   margin: 0 0 10px;
   max-width: 62ch;
 }
+.footer .footer-sign {
+  margin: 0 0 18px;
+  max-width: none;
+  font-family: var(--font-stencil), sans-serif;
+  font-size: clamp(52px, 15vw, 140px);
+  font-weight: 800;
+  line-height: 0.82;
+  color: var(--paint);
+}
 .footer-links {
   display: flex;
   flex-wrap: wrap;
-  gap: 18px;
+  gap: 4px 20px;
   font-weight: 700;
   color: var(--paint);
+}
+.footer-links a {
+  white-space: nowrap;
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
 }
 
 /* ---------- Páginas simples (estado, 404) ---------- */
@@ -568,9 +749,28 @@ a.staff-cell:hover .staff-name {
   overflow-x: auto;
 }
 
+@media (max-width: 899px) {
+  .only-wide {
+    display: none;
+  }
+}
 @media (min-width: 900px) {
+  .only-narrow {
+    display: none;
+  }
   .water-text {
-    left: max(72px, calc(50vw - 360px));
+    left: 104px;
+    max-width: 560px;
+    gap: 10px;
+  }
+  .headline {
+    font-size: 48px;
+  }
+  .sentence {
+    font-size: 19px;
+  }
+  .big-number {
+    font-size: clamp(300px, 26vw, 420px);
   }
 }
 

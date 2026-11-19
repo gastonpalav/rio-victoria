@@ -19,6 +19,10 @@
 
   --evac-paint: #C0121F;
   --alert-paint: #A85F00;
+  --alert-wash: #F1DDB8;
+
+  /* margen izquierdo de todo lo que va debajo de la pared */
+  --gutter: clamp(16px, 7vw, 112px);
 
   --staff: #FFFFFF;
   --mark: #12283A;

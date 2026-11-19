@@ -78,3 +78,26 @@ describe("frescura calculada en el navegador (la caché del servidor puede tener
     expect(document.body.textContent).toContain("dato viejo");
   });
 });
+
+import { YearFacts } from "@/components/YearFacts";
+
+describe("YearFacts: marcas pintadas", () => {
+  it("pinta hoy, hace un año y la alerta con sus cifras en texto", () => {
+    const { container } = render(<YearFacts rate={0.12} daysAboveAlert={4} lastYearM={3.37} nowM={4.91} alertM={4.6} />);
+    expect(container.querySelectorAll(".mark").length).toBe(3);
+    const t = document.body.textContent ?? "";
+    expect(t).toContain("Hoy 4,91");
+    expect(t).toContain("Hace un año 3,37");
+    expect(t).toContain("hoy está 1,54 m más alto");
+    expect(t).toContain("4 días por encima en los últimos 12 meses");
+  });
+  it("los rótulos no se pisan aunque las marcas estén pegadas", () => {
+    const { container } = render(<YearFacts rate={0} daysAboveAlert={0} lastYearM={4.6} nowM={4.61} alertM={4.6} />);
+    const tops = [...container.querySelectorAll<HTMLElement>(".mark-label")].map((e) => parseFloat(e.style.top)).sort((a, b) => a - b);
+    for (let i = 1; i < tops.length; i++) expect(tops[i]! - tops[i - 1]!).toBeGreaterThanOrEqual(70);
+  });
+  it("sin lectura de hoy no muestra nada", () => {
+    const { container } = render(<YearFacts rate={null} daysAboveAlert={null} lastYearM={3} nowM={null} />);
+    expect(container.innerHTML).toBe("");
+  });
+});

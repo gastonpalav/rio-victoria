@@ -53,6 +53,22 @@ export function travelNote(t: { minDays: number; maxDays: number }): string {
   return `llega acá en ${t.minDays} a ${t.maxDays} días`;
 }
 
+/** Versión corta para debajo de las reglas chicas (entra en una columna de celular). */
+export function travelShort(t: { minDays: number; maxDays: number }): string {
+  if (t.maxDays <= 1) return "1 día o menos";
+  if (t.minDays === t.maxDays) return `unos ${t.maxDays} días`;
+  if (t.minDays === 0) return `hasta ${t.maxDays} días`;
+  return `${t.minDays} a ${t.maxDays} días`;
+}
+
+/** Cuánto está un puerto respecto de sus niveles, en dos partes cortas: la cifra pintada y a qué nivel se refiere. */
+export function upstreamDelta(s: Levels): { figure: string; label: string; tone: "evac" | "alert" | "ok" } | null {
+  if (s.heightM === null || s.alertM === null || s.evacuationM === null) return null;
+  if (s.heightM >= s.evacuationM) return { figure: `+${cm(s.heightM - s.evacuationM)}`, label: "sobre evacuación", tone: "evac" };
+  if (s.heightM >= s.alertM) return { figure: `+${cm(s.heightM - s.alertM)}`, label: "sobre alerta", tone: "alert" };
+  return { figure: `−${cm(s.alertM - s.heightM)}`, label: "bajo alerta", tone: "ok" };
+}
+
 export function rateText(mPerDay: number): { figure: string; rest: string } {
   const c = Math.round(mPerDay * 100);
   if (c === 0) return { figure: "Quieto", rest: "en los últimos 3 días" };
