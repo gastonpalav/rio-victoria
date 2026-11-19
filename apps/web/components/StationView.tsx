@@ -5,6 +5,7 @@ import { Logo } from "./Logo";
 import { Hero } from "./Hero";
 import { Upstream } from "./Upstream";
 import { StationPicker } from "./StationPicker";
+import { ShareImage } from "./ShareImage";
 import { SourceFooter } from "./SourceFooter";
 import { WindBand } from "./WindBand";
 import { YearFacts } from "./YearFacts";
@@ -22,7 +23,10 @@ export async function StationView({ slug }: { slug: string }) {
         <a href="/" className="home" aria-label="regla, inicio (Victoria)">
           <Logo />
         </a>
-        <StationPicker current={station.slug} options={options} />
+        <div className="topbar-tools">
+          {station.heightM !== null && <ShareImage slug={station.slug} name={station.name} />}
+          <StationPicker current={station.slug} options={options} />
+        </div>
       </header>
       <main>
         <h1 className="sr-only">Altura del río en {station.name}</h1>

@@ -62,3 +62,11 @@ describe("heroScale: lugar para el número arriba del agua", () => {
     expect(b.top).toBeCloseTo(a.top);
   });
 });
+
+describe("heroScale: el texto entra en el agua también a la izquierda", () => {
+  it("Victoria 4,91 con la semana arrancando en 4,32: lo más bajo de la superficie queda en el 40% de abajo o más", () => {
+    const s = heroScale(4.91, 4.6, 4.9, 4.32);
+    expect(s.pos(4.32)).toBeGreaterThanOrEqual(0.38);
+    expect(1 - s.level).toBeGreaterThanOrEqual(0.37);
+  });
+});

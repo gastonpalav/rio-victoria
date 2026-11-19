@@ -62,19 +62,33 @@ export function ShareImage({ slug, name }: { slug: string; name: string }) {
     setState("idle");
   }
 
-  const label = state === "working" ? "Armando la imagen…" : state === "ready" ? "Imagen lista: compartir" : "Compartir imagen";
+  const label =
+    state === "working" ? "Armando la imagen…" : state === "ready" ? "Imagen lista: tocá para compartir" : "Compartir imagen";
+  // Arriba, al lado del puerto: un ícono cuadrado para no agrandar el texto que va dentro del agua.
   return (
     <div className="share">
-      <button type="button" onClick={share} disabled={state === "working"} aria-busy={state === "working"}>
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-          <rect x="5" y="3" width="14" height="18" />
-          <path d="M5 15l4-3 3 2 3-3 4 3" />
+      <button
+        type="button"
+        onClick={share}
+        disabled={state === "working"}
+        aria-busy={state === "working"}
+        aria-label={label}
+        title={label}
+        className={state === "ready" ? "is-ready" : undefined}
+      >
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M12 15V3M7 8l5-5 5 5" />
+          <path d="M5 12v9h14v-9" />
         </svg>
-        {label}
       </button>
       {state === "error" && (
-        <p className="share-error" role="alert">
+        <p className="share-msg" role="alert">
           No se pudo armar la imagen. Probá de nuevo en un rato.
+        </p>
+      )}
+      {state === "ready" && (
+        <p className="share-msg" role="status">
+          Imagen lista: tocá de nuevo para compartir.
         </p>
       )}
     </div>

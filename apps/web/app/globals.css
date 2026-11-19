@@ -71,6 +71,56 @@ a {
   letter-spacing: 0.01em;
 }
 
+.topbar-tools {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+/* Compartir: un cuadrado pintado como el selector, sin píldora. */
+.share {
+  position: relative;
+  flex: none;
+}
+.share button {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 2.5px solid var(--paint);
+  border-radius: 0;
+  background: transparent;
+  color: var(--paint);
+  cursor: pointer;
+}
+.share button:hover,
+.share button.is-ready {
+  background: var(--paint);
+  color: var(--wall);
+}
+.share button:active {
+  transform: translateY(1px);
+}
+.share button:disabled {
+  cursor: progress;
+  opacity: 0.6;
+}
+.share-msg {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: max-content;
+  max-width: min(260px, 70vw);
+  margin: 0;
+  padding: 6px 10px;
+  background: var(--paint);
+  color: var(--wall);
+  font-size: 14px;
+  font-weight: 700;
+}
+
 .picker {
   position: relative;
   display: inline-flex;
@@ -79,7 +129,7 @@ a {
 .picker select {
   appearance: none;
   min-height: 44px;
-  max-width: 50vw;
+  max-width: 42vw;
   padding: 0 34px 0 12px;
   border: 2.5px solid var(--paint);
   border-radius: 0;
@@ -321,6 +371,11 @@ a {
   gap: 8px;
   max-width: 480px;
 }
+.water-text-backed {
+  padding: 12px 14px 4px;
+  margin-left: -14px;
+  background: var(--river-deep);
+}
 .headline {
   margin: 0;
   font-family: var(--font-stencil), sans-serif;
@@ -363,44 +418,6 @@ a {
   text-decoration: underline;
   text-decoration-thickness: 3px;
   text-underline-offset: 6px;
-}
-/* Compartir: un rectángulo pintado con el color del texto del agua, sin píldora. */
-.share {
-  margin-top: 4px;
-}
-.share button {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 44px;
-  padding: 0 14px;
-  border: 2.5px solid var(--on-river);
-  border-radius: 0;
-  background: transparent;
-  color: var(--on-river);
-  font: 800 19px var(--font-stencil), sans-serif;
-  letter-spacing: 0.03em;
-  cursor: pointer;
-  white-space: nowrap;
-}
-.share button:hover {
-  background: var(--on-river);
-  color: var(--river-deep);
-}
-.share button:focus-visible {
-  outline: 3px solid var(--on-river);
-  outline-offset: 3px;
-}
-.share button:active {
-  transform: translateY(1px);
-}
-.share button:disabled {
-  cursor: progress;
-  opacity: 0.75;
-}
-.share-error {
-  margin: 6px 0 0;
-  font-weight: 700;
 }
 .range-error {
   margin: 0;

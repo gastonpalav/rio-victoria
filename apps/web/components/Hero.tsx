@@ -7,7 +7,6 @@ import { TREND_LABEL, changeSentence, fmtM, levelSentence } from "@/lib/copy";
 import { heroScale } from "@/lib/scale";
 import { buildSurface } from "@/lib/surface";
 import { ReadingMeta, StaleBanner } from "./Freshness";
-import { ShareImage } from "./ShareImage";
 import { TrendIcon } from "./TrendIcon";
 
 type Props = {
@@ -37,7 +36,10 @@ export function Hero({ station: s, series = [], from, to, yearMax = null }: Prop
   const [covered, setCovered] = useState<string[]>([]);
   useLayoutEffect(() => {
     const check = () => {
-      const text = textRef.current?.getBoundingClientRect();
+      const el = textRef.current;
+      const r0 = el?.getBoundingClientRect();
+      // Se mide sin el relleno del fondo: si no, el fondo agranda el bloque, tapa otro rótulo y así sigue.
+      const text = r0 && { left: r0.left, right: r0.right, bottom: r0.bottom, top: r0.top + (el!.classList.contains("water-text-backed") ? 12 : 0) };
       const wall = wallRef.current;
       if (!text || !wall) return;
       const hit = [...wall.querySelectorAll<HTMLElement>("[data-level-label]")]
@@ -47,6 +49,17 @@ export function Hero({ station: s, series = [], from, to, yearMax = null }: Prop
         })
         .map((el) => el.dataset.levelLabel!);
       setCovered((prev) => (prev.join("|") === hit.join("|") ? prev : hit));
+      // Si con este período la superficie baja tanto a la izquierda que el texto quedaría sobre la pared clara
+      // (un año con mucha variación), el texto lleva fondo color río para seguir leyéndose.
+      const line = wall.querySelector(".river-surface")?.getAttribute("points") ?? "";
+      const w = wall.getBoundingClientRect();
+      let lowest = -Infinity;
+      for (const pt of line.split(" ")) {
+        const [x, y] = pt.split(",").map(Number);
+        const px = w.left + (x! / 1000) * w.width;
+        if (px >= text.left && px <= text.right) lowest = Math.max(lowest, w.top + (y! / 1000) * w.height);
+      }
+      textRef.current!.classList.toggle("water-text-backed", text.top < lowest + 8);
     };
     check();
     window.addEventListener("resize", check);
@@ -240,8 +253,12 @@ export function Hero({ station: s, series = [], from, to, yearMax = null }: Prop
           </div>
         )}
         {(change || level) && <p className="sentence">{[change, level].filter(Boolean).join(" ")}</p>}
-        {covered.length > 0 && <p className="meta">Bajo el agua, las líneas de Prefectura: {covered.join(" y ")}.</p>}
-        {maxBehindNumber && <p className="meta only-narrow">{maxText} (la línea azul).</p>}
+        {(covered.length > 0 || maxBehindNumber) && (
+          <p className={covered.length > 0 ? "meta" : "meta only-narrow"}>
+            {covered.length > 0 && <>Bajo el agua: {covered.join(" y ")}. </>}
+            {maxBehindNumber && <span className="only-narrow">{maxText} (la línea azul).</span>}
+          </p>
+        )}
         <ReadingMeta ts={ts} periodHours={s.periodHours} initialStale={s.stale} name={s.name} />
         {from && (
           <div className="range" role="group" aria-label="Período que muestra la superficie del agua">
@@ -257,7 +274,6 @@ export function Hero({ station: s, series = [], from, to, yearMax = null }: Prop
             {error}
           </p>
         )}
-        <ShareImage slug={s.slug} name={s.name} />
       </div>
     </section>
   );
