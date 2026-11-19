@@ -1,5 +1,5 @@
 "use client";
-import { useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { formatArt } from "@rio/core/pure";
 import type { StationDto } from "@/lib/api";
 import { RANGES, rangeHeadline, type SeriesPoint } from "@/lib/chart";
@@ -28,6 +28,44 @@ export function Hero({ station: s, series = [], from, to, yearMax = null }: Prop
   );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const inflight = useRef(new Map<string, Promise<boolean>>());
+  const end = to ?? s.ts ?? "";
+
+  /** Trae un período. `from` va redondeado al día: la misma URL para todos → la sirve la caché de Vercel. */
+  function load(i: number): Promise<boolean> {
+    const r = RANGES[i]!;
+    const pending = inflight.current.get(r.key);
+    if (pending) return pending;
+    const day = new Date(new Date(end).getTime() - r.days * 86_400_000).toISOString().slice(0, 10);
+    const f = `${day}T00:00:00.000Z`;
+    const p = fetch(`/api/stations/${s.slug}/readings?from=${day}`)
+      .then(async (res) => {
+        if (!res.ok) throw new Error(String(res.status));
+        const body = (await res.json()) as { readings: SeriesPoint[] };
+        setCache((c) => ({ ...c, [r.key]: { from: f, points: body.readings } }));
+        return true;
+      })
+      .catch(() => {
+        inflight.current.delete(r.key);
+        return false;
+      });
+    inflight.current.set(r.key, p);
+    return p;
+  }
+
+  // Precarga los otros períodos en segundo plano, de a uno, así el botón responde al instante.
+  useEffect(() => {
+    if (!from || !end) return;
+    let cancelled = false;
+    const t = setTimeout(async () => {
+      for (let i = 1; i < RANGES.length && !cancelled; i++) await load(i);
+    }, 1500);
+    return () => {
+      cancelled = true;
+      clearTimeout(t);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [s.slug]);
 
   if (s.heightM === null || s.ts === null) {
     return (
@@ -38,27 +76,17 @@ export function Hero({ station: s, series = [], from, to, yearMax = null }: Prop
   }
   const heightM = s.heightM;
   const ts = s.ts;
-  const end = to ?? ts;
   const range = RANGES[rangeIdx]!;
   const current = cache[range.key] ?? cache[RANGES[0]!.key] ?? { from: ts, points: [] };
 
   async function pick(i: number) {
     setRangeIdx(i);
     setError(null);
-    const r = RANGES[i]!;
-    if (cache[r.key]) return;
-    const f = new Date(new Date(end).getTime() - r.days * 86_400_000).toISOString();
+    if (cache[RANGES[i]!.key]) return;
     setLoading(true);
-    try {
-      const res = await fetch(`/api/stations/${s.slug}/readings?from=${encodeURIComponent(f)}`);
-      if (!res.ok) throw new Error(String(res.status));
-      const body = (await res.json()) as { readings: SeriesPoint[] };
-      setCache((c) => ({ ...c, [r.key]: { from: f, points: body.readings } }));
-    } catch {
-      setError("No se pudo cargar ese período. Probá de nuevo en un rato.");
-    } finally {
-      setLoading(false);
-    }
+    const ok = await load(i);
+    setLoading(false);
+    if (!ok) setError("No se pudo cargar ese período. Probá de nuevo en un rato.");
   }
 
   // La escala incluye lo más bajo del período para que la superficie no se salga de la pared.

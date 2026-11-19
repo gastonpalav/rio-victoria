@@ -62,6 +62,10 @@ describe("SourceFooter", () => {
     expect(link.getAttribute("href")).toBe("https://contenidosweb.prefecturanaval.gob.ar/alturas/");
     expect(document.body.textContent).toContain("Sitio no oficial");
   });
+  it("tiene el link Sobre mí al portfolio", () => {
+    render(<SourceFooter />);
+    expect(screen.getByRole("link", { name: "Sobre mí" }).getAttribute("href")).toBe("https://gastonpalav.com.ar/");
+  });
 });
 
 describe("frescura calculada en el navegador (la caché del servidor puede tener el flag congelado)", () => {

@@ -6,7 +6,7 @@ import { publicError } from "@/lib/public-error";
 import { SourceFooter } from "@/components/SourceFooter";
 import { getDb, getStationsData, READINGS_TAG } from "@/lib/data";
 
-export const metadata: Metadata = { title: "Estado de los datos — regla" };
+export const metadata: Metadata = { title: "Estado de los datos" };
 
 async function getStatus() {
   "use cache";

@@ -11,6 +11,7 @@ export function SourceFooter() {
         <a href="/api/stations">API pública</a>
         <a href="https://github.com/gastonpalav/rio-victoria">Código</a>
         <a href="/estado">Estado de los datos</a>
+        <a href="https://gastonpalav.com.ar/">Sobre mí</a>
       </p>
       </div>
     </footer>

@@ -48,3 +48,17 @@ describe("heroScale: lugar para el texto dentro del agua", () => {
     expect(s.pos(0.2)).toBeGreaterThan(0);
   });
 });
+
+describe("heroScale: lugar para el número arriba del agua", () => {
+  it("con un año de serie muy baja, el agua no sube tanto como para tapar el selector", () => {
+    const s = heroScale(4.91, 4.6, 4.9, 0.3);
+    expect(s.level).toBeLessThanOrEqual(0.62);
+    expect(s.pos(0.3)).toBeGreaterThan(0);
+    expect(s.evacuation!).toBeLessThan(1);
+  });
+  it("con la serie de 7 días la escala no cambia", () => {
+    const a = heroScale(4.85, 4.6, 4.9);
+    const b = heroScale(4.85, 4.6, 4.9, 4.6);
+    expect(b.top).toBeCloseTo(a.top);
+  });
+});

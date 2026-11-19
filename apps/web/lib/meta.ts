@@ -9,9 +9,9 @@ export async function stationMetadata(slug: string, path: string): Promise<Metad
   cacheLife({ stale: 60, revalidate: 300, expire: 86_400 });
   cacheTag(READINGS_TAG);
   const page = await getStationPage(slug);
-  if (!page) return { title: "Puerto no encontrado — regla" };
+  if (!page) return { title: "Puerto no encontrado" };
   const s = page.station;
-  const title = s.heightM !== null ? `${s.name}: ${fmtM(s.heightM)} m — regla` : `${s.name} — regla`;
+  const title = s.heightM !== null ? `${s.name}: ${fmtM(s.heightM)} m` : s.name;
   const description =
     s.heightM !== null && s.ts && s.trend
       ? `Río ${s.river === "PARANA" ? "Paraná" : s.river.toLowerCase()} en ${s.name}: ${fmtM(s.heightM)} m, ${TREND_LABEL[s.trend].toLowerCase()}. Lectura de Prefectura del ${formatArt(new Date(s.ts))}.`
