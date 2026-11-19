@@ -152,7 +152,7 @@ a {
   height: 100lvh;
   --under-bars: calc(100lvh - 100svh);
   min-height: 640px;
-  max-height: 1100px;
+  /* Sin tope de alto: en un monitor grande la pared llena la pantalla y no asoma la sección siguiente. */
   overflow: hidden;
   isolation: isolate;
   /* Para medir el lugar libre sobre el agua (cqh = alto de la pared). */
@@ -160,7 +160,7 @@ a {
   /* Lugar para la cifra: lo que queda sobre el agua, menos la barra de arriba (logo, compartir, puerto),
      el rótulo "metros en …" y, si hay, el aviso de lectura vieja. */
   --reading-extra: 0px;
-  --number-room: calc(((1 - var(--level, 0.5)) * 100cqh - 64px - 26px - var(--reading-extra)) / 0.84);
+  --number-room: calc(((1 - var(--level, 0.5)) * 100cqh - 64px - 30px - var(--reading-extra)) / 0.9);
 }
 .wall:has(.stale) {
   --reading-extra: 96px;
@@ -345,7 +345,7 @@ a {
   /* Nunca más alta que el lugar sobre el agua: si no, se mete debajo del selector de puerto. */
   font-size: max(64px, min(clamp(130px, 42vw, 300px), var(--number-room)));
   font-weight: 800;
-  line-height: 0.8;
+  line-height: 0.86; /* con 0,8 la punta de los números tocaba "metros en …" */
   letter-spacing: -0.01em;
   font-variant-numeric: tabular-nums;
   color: var(--paint);
@@ -1068,6 +1068,9 @@ a.staff-cell:hover .staff-name {
   }
   .sentence {
     font-size: 19px;
+  }
+  .unit {
+    font-size: 20px;
   }
   .big-number {
     font-size: max(64px, min(clamp(300px, 26vw, 420px), var(--number-room)));
