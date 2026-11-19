@@ -99,6 +99,35 @@ function ForecastBody({ forecast, station, nowM, ts }: { forecast: ForecastView;
         {worseLately && <> En las últimas semanas, con el río más movido, erró más: {errorList((d) => d.recentMaeM)}.</>}
         {forecast.coverage !== null && <> El río quedó dentro del rango el {Math.round(forecast.coverage * 100)}% de las veces.</>}
       </p>
+      <details className="fc-how">
+        <summary>Cómo se calcula</summary>
+        <p>Es una cuenta simple, mitad y mitad:</p>
+        <div className="fc-formula" role="group" aria-label="La fórmula">
+          <p>
+            <span className="fc-term">cambio</span> = ½ × <span className="fc-term">tendencia</span> + ½ ×{" "}
+            <span className="fc-term">lo que viene de arriba</span>
+          </p>
+        </div>
+        <dl className="fc-terms">
+          <dt>Tendencia</dt>
+          <dd>Cuánto subió o bajó acá en los últimos 3 días, al mismo ritmo. Si subió 30 cm en 3 días, a 5 días suma 50 cm.</dd>
+          <dt>Lo que viene de arriba</dt>
+          <dd>
+            Lo que ya subió o bajó en {list(forecast.from)} y todavía no llegó acá. También mira cómo vienen esos puertos
+            y este en los últimos 3 días. Cuánto tarda el agua y cuánto pesa cada dato sale del último año (mínimos
+            cuadrados), por separado para 1, 3 y 5 días.
+          </dd>
+          <dt>El rango</dt>
+          <dd>
+            Es lo que se equivocó la cuenta cuando se la probó, sin el 8% de errores más grandes de cada lado. Si
+            últimamente se equivocó más, el rango se agranda.
+          </dd>
+        </dl>
+        <p>
+          Si para algún día no le gana por un 10% a decir “queda igual” o no le gana a seguir la tendencia, ese día no
+          aparece. No sabe nada de lluvias ni de represas: solo mira alturas.
+        </p>
+      </details>
       <p className="forecast-proof">
         Los pronósticos oficiales del Paraná los publica el{" "}
         <a href="https://www.ina.gob.ar/alerta/" rel="noopener">

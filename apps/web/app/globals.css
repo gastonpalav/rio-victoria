@@ -791,6 +791,79 @@ a.staff-cell:hover .staff-name {
   color: inherit;
 }
 
+/* Cómo se calcula: cerrado de entrada; la fórmula pintada sobre la pared, con regla a la izquierda. */
+.fc-how {
+  margin: 18px 0 0;
+  max-width: 62ch;
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--paint-soft);
+}
+.fc-how summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  font-weight: 700;
+  color: var(--paint);
+  cursor: pointer;
+  list-style: none;
+}
+.fc-how summary::-webkit-details-marker {
+  display: none;
+}
+.fc-how summary::before {
+  content: "+";
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: 2.5px solid var(--paint);
+  font-family: var(--font-stencil), sans-serif;
+  font-size: 20px;
+  line-height: 1;
+}
+.fc-how[open] summary::before {
+  content: "−";
+}
+.fc-how summary:focus-visible {
+  outline: 3px solid var(--paint);
+  outline-offset: 3px;
+}
+.fc-how p {
+  margin: 10px 0 0;
+}
+.fc-formula {
+  margin: 14px 0 6px;
+  padding: 10px 0 10px 16px;
+  border-left: 6px solid var(--paint);
+}
+.fc-formula p {
+  margin: 0;
+  font-family: var(--font-stencil), sans-serif;
+  font-size: clamp(24px, 6.4vw, 36px);
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--paint);
+}
+.fc-term {
+  text-decoration: underline;
+  text-decoration-thickness: 3px;
+  text-underline-offset: 5px;
+  text-decoration-color: var(--river);
+}
+.fc-terms {
+  margin: 14px 0 0;
+}
+.fc-terms dt {
+  margin-top: 12px;
+  font-weight: 700;
+  color: var(--paint);
+}
+.fc-terms dd {
+  margin: 2px 0 0;
+}
+
 /* ---------- Para comparar: marcas de crecientes pintadas en la pared ---------- */
 .year {
   padding-top: 56px;

@@ -143,6 +143,16 @@ describe("Forecast: cómo puede seguir", () => {
     expect(t).toContain("El viernes 20 el rango ya llega al nivel de evacuación de Prefectura (4,90 m); el domingo 22 queda entero por encima.");
     expect(t).not.toMatch(/evacu(á|ar|en)\b/i);
   });
+  it("explica cómo se calcula, con la fórmula y los puertos que usa", () => {
+    const { container } = render(<Forecast forecast={forecast} station={fresh} />);
+    const how = container.querySelector("details.fc-how");
+    expect(how).not.toBeNull();
+    expect(how!.hasAttribute("open")).toBe(false);
+    const t = how!.textContent ?? "";
+    expect(t).toContain("cambio = ½ × tendencia + ½ × lo que viene de arriba");
+    expect(t).toContain("Lo que ya subió o bajó en Diamante, Santa Fe y Paraná y todavía no llegó acá");
+    expect(t).toContain("no le gana por un 10% a decir “queda igual”");
+  });
   it("si últimamente no erró más que en el promedio, no lo agrega", () => {
     const calm = { ...forecast, days: forecast.days.map((d) => ({ ...d, recentMaeM: d.maeM / 2 })) };
     render(<Forecast forecast={calm} station={fresh} />);
