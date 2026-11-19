@@ -645,35 +645,89 @@ a.staff-cell:hover .staff-name {
   padding-top: 56px;
   padding-bottom: 8px;
 }
+.year-lede {
+  margin: 14px 0 0;
+  max-width: 30ch;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.3;
+}
 .marks {
   position: relative;
-  margin-top: 34px;
+  margin-top: 26px;
   max-width: 980px;
+  overflow: hidden;
 }
-.mark-line {
+/* La regla: esmalte blanco con una marca cada 10 cm y el número cada medio metro. */
+.marks-staff {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--staff-w);
+  background: var(--staff);
+  z-index: 2;
+}
+.tick {
+  position: absolute;
+  left: 0;
+  width: 14px;
+  height: 2px;
+  background: var(--mark);
+}
+.tick-major {
+  width: 22px;
+  height: 4px;
+  margin-top: -1px;
+}
+.tick b {
+  position: absolute;
+  left: 25px;
+  top: 50%;
+  transform: translateY(-50%);
+  font: 800 12px var(--font-stencil), sans-serif;
+  color: var(--mark);
+}
+/* El agua de hoy: llega hasta la línea HOY y se ve por encima de la regla, como en la costa. */
+.marks-water {
   position: absolute;
   left: 0;
   right: 0;
+  bottom: 0;
+  z-index: 3;
+  background: linear-gradient(var(--river-top), var(--river) 35%, var(--river-deep));
+  opacity: 0.8;
+}
+.mark-line {
+  position: absolute;
+  left: var(--staff-w);
+  right: 0;
   height: 0;
+  z-index: 4;
 }
 .mark-now .mark-line {
-  border-top: 6px solid var(--paint);
-  margin-top: -3px;
+  left: 0;
+  border-top: 4px solid var(--river-line);
+  margin-top: -2px;
 }
 .mark-year .mark-line {
-  border-top: 3px solid var(--paint);
-  margin-top: -1.5px;
-  right: 22%;
+  border-top: 4px solid var(--paint);
+  margin-top: -2px;
+}
+.mark-year.mark-under .mark-line {
+  border-top-color: var(--on-river);
 }
 .mark-alert .mark-line {
   border-top: 4px dashed var(--alert-paint);
   margin-top: -2px;
 }
+.mark-alert.mark-under .mark-line {
+  border-top-color: var(--alert-wash);
+}
 .mark-label {
   position: absolute;
-  left: 0;
+  left: calc(var(--staff-w) + 12px);
+  right: 8px;
+  z-index: 5;
   margin: 0;
-  max-width: calc(100% - 64px);
   display: flex;
   flex-direction: column;
   gap: 1px;
@@ -696,40 +750,9 @@ a.staff-cell:hover .staff-name {
 .mark-alert .mark-title {
   color: var(--alert-paint);
 }
-.marks-gap {
-  position: absolute;
-  right: 44px;
-  width: 0;
-  border-left: 3px solid var(--paint);
-}
-.marks-gap::before,
-.marks-gap::after {
-  content: "";
-  position: absolute;
-  left: -8.5px;
-  border: 7px solid transparent;
-}
-.marks-gap::before {
-  top: 0;
-  border-top: 0;
-  border-bottom: 11px solid var(--paint);
-}
-.marks-gap::after {
-  bottom: 0;
-  border-bottom: 0;
-  border-top: 11px solid var(--paint);
-}
-/* La diferencia va escrita a lo largo de la flecha, como se pinta una medida en obra. */
-.marks-gap span {
-  position: absolute;
-  left: 8px;
-  top: 50%;
-  transform: translateY(-50%);
-  writing-mode: vertical-rl;
-  padding: 4px 0;
-  background: var(--wall);
-  font: 800 30px var(--font-stencil), sans-serif;
-  white-space: nowrap;
+.mark-label-water,
+.mark-alert .mark-label-water .mark-title {
+  color: var(--on-river);
 }
 .marks-extra {
   margin: 16px 0 0;
