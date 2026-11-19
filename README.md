@@ -12,6 +12,7 @@ La pantalla principal es una **regla hidrométrica** — la escala pintada con "
 - "Hace cuánto" se calcula con la hora **de la lectura**, no la del sistema. Si un puerto deja de reportar, la página lo dice en vez de mostrar un dato viejo como actual (el umbral es por puerto: 3 × su período de reporte, mínimo 6 h).
 - Gráfica de 7 días, 1 mes, 6 meses o 1 año, con eje de tiempo real.
 - **Lo que viene de arriba**: Diamante, Santa Fe y Paraná, porque lo que pasa ahí llega a Victoria días después.
+- **Cómo puede seguir**: una estimación propia a 1, 3 y 5 días, siempre como rango y con el error medido al lado (ver abajo).
 - Los 89 puertos que publica Prefectura (`/rosario`, `/campana`, …).
 - Vista previa para WhatsApp con la altura y la hora de la lectura.
 
@@ -33,6 +34,19 @@ Vercel (región gru1, San Pablo)             │
 - **Upsert idempotente** por `(puerto, hora)`. Cuando la tabla principal y el historial no coinciden, gana la tabla: el historial va atrasado.
 - **Historia propia**: arrancó con el año que publica Prefectura y desde ahí se acumula sin límite.
 - **Por qué la lectura corre en Vercel**: Prefectura no responde a las IPs de Railway; desde la región de San Pablo sí. El cron de Railway sólo dispara la ruta protegida.
+
+## La estimación
+
+"Cómo puede seguir" no es un pronóstico oficial (esos los publica el [INA](https://www.ina.gob.ar/alerta/)). Es una cuenta chica, en `packages/core/src/forecast.ts`, sin dependencias:
+
+- **Qué hace**: promedia dos estimaciones del cambio de altura. Una sigue la tendencia propia de los últimos 3 días. La otra es una regresión sobre lo que ya pasó en los puertos de arriba y todavía no llegó, usando el tiempo de viaje que sale de `travelDays`.
+- **Cómo se prueba**: en cada carga, para cada día del último medio año, arma la estimación solo con lo que se sabía ese día y la compara con lo que después pasó. De esos errores salen el rango y el número que se publica.
+- **Cuándo se calla**: si el dato del puerto es viejo, si no hay puertos de arriba con relación clara, si hay menos de ~8 meses de historia, o si a esa distancia no le gana a decir "queda igual que hoy" (por al menos 10%) y a seguir la tendencia.
+- **De dónde parte**: del promedio de las últimas 24 h hasta la última lectura, no del día de calendario, para no arrancar de un dato viejo cuando el río se mueve rápido.
+
+En Victoria, al 19/11/2026 (181 días de prueba): error medio de 1 cm a un día, 3 cm a tres y 4 cm a cinco; el río quedó dentro del rango el 78% de las veces. Con el río movido le erra más, y la página lo dice cuando pasa.
+
+Límites conocidos: el año de historia tiene una sola creciente, así que con el río muy alto hay pocos casos para medir. Y la forma del modelo y el ancho del rango se eligieron mirando esos mismos ~180 días de prueba, así que los errores publicados son algo optimistas; la mejora sobre simplemente seguir la tendencia es modesta (del orden del 15%).
 
 ## API pública
 
@@ -61,7 +75,7 @@ curl "https://<dominio>/api/stations/victoria/readings?from=2026-10-01&to=2026-1
 
 ```bash
 npm install
-npm test                      # 70+ tests: parsers, base (PGlite), jobs, API, componentes
+npm test                      # 150+ tests: parsers, base (PGlite), jobs, API, componentes
 
 # Base: cualquier Postgres
 export DATABASE_URL=postgres://...

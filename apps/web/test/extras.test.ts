@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import { type Db, getStations, upsertReadings } from "@rio/core";
 import { createTestDb } from "@rio/core/testing";
 import { runScrape } from "@rio/scraper/jobs";
-import { buildExtras } from "@/lib/extras";
+import { buildExtras, forecastTargets } from "@/lib/extras";
 
 const mainHtml = readFileSync(new URL("../../../packages/core/test/fixtures/main.html", import.meta.url), "utf8");
 const NOW = new Date("2026-11-18T19:40:00Z");
@@ -65,5 +65,61 @@ describe("buildExtras", () => {
     const e = await buildExtras(db, first, all, NOW);
     expect(e.travel).toEqual({});
     expect(e.upstreamSlugs).toEqual([]);
+  });
+});
+
+describe("buildExtras: cómo puede seguir", () => {
+  it("estima los próximos días con el puerto de arriba que avisa, siempre como rango", async () => {
+    const all = await getStations(db);
+    const e = await buildExtras(db, all.find((s) => s.slug === "victoria")!, all, NOW);
+    expect(e.forecast).not.toBeNull();
+    expect(e.forecast!.from).toEqual(["Paraná"]);
+    expect(e.forecast!.tested).toBeGreaterThanOrEqual(60);
+    for (const d of e.forecast!.days) {
+      expect(d.date > "2026-11-18").toBe(true);
+      expect(d.loM).toBeLessThan(d.hiM);
+      expect(d.maeM).toBeGreaterThan(0);
+    }
+  });
+
+  it("si el dato del puerto es viejo no estima nada", async () => {
+    const all = await getStations(db);
+    const e = await buildExtras(db, all.find((s) => s.slug === "victoria")!, all, new Date(NOW.getTime() + 2 * DAY));
+    expect(e.forecast).toBeNull();
+  });
+
+  it("un puerto sin nada arriba no tiene estimación", async () => {
+    const all = await getStations(db);
+    const first = all.filter((s) => s.river === "PARANA").sort((a, b) => a.riverOrder - b.riverOrder)[0]!;
+    expect((await buildExtras(db, first, all, NOW)).forecast).toBeNull();
+  });
+});
+
+describe("forecastTargets: de días desde hoy a tramos de 24 h", () => {
+  const at = (iso: string) => new Date(iso); // Argentina es UTC−3
+  it("con la última lectura de la tarde, mañana es el tramo siguiente", () => {
+    const t = forecastTargets(at("2026-11-19T19:00:00Z"), at("2026-11-19T19:40:00Z"));
+    expect(t).toEqual([
+      { date: "2026-11-20", ahead: 1, horizon: 1 },
+      { date: "2026-11-22", ahead: 3, horizon: 3 },
+      { date: "2026-11-24", ahead: 5, horizon: 5 },
+    ]);
+  });
+  it("con la última lectura de la mañana, mañana queda un tramo más lejos", () => {
+    const t = forecastTargets(at("2026-11-19T12:00:00Z"), at("2026-11-19T12:30:00Z")); // 9:00 en Argentina
+    expect(t!.map((x) => x.horizon)).toEqual([2, 4, 6]);
+    expect(t!.map((x) => x.date)).toEqual(["2026-11-20", "2026-11-22", "2026-11-24"]);
+  });
+  it("justo después de medianoche, con la lectura de anoche, las fechas son las del día nuevo", () => {
+    const t = forecastTargets(at("2026-11-20T02:00:00Z"), at("2026-11-20T03:30:00Z")); // lectura 23:00 del 19; ahora 0:30 del 20
+    expect(t!.map((x) => x.date)).toEqual(["2026-11-21", "2026-11-23", "2026-11-25"]);
+    expect(t!.map((x) => x.horizon)).toEqual([2, 4, 6]);
+  });
+  it("al mediodía en punto la lectura todavía cuenta como de la mañana", () => {
+    expect(forecastTargets(at("2026-11-19T14:59:00Z"), at("2026-11-19T15:10:00Z"))!.map((x) => x.horizon)).toEqual([2, 4, 6]);
+    expect(forecastTargets(at("2026-11-19T15:00:00Z"), at("2026-11-19T15:10:00Z"))!.map((x) => x.horizon)).toEqual([1, 3, 5]);
+  });
+  it("con una lectura de hace más de un día y medio no hay tramos", () => {
+    expect(forecastTargets(at("2026-11-17T19:00:00Z"), at("2026-11-19T19:40:00Z"))).toBeNull();
   });
 });

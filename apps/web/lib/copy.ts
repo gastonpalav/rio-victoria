@@ -81,3 +81,42 @@ export function lastYearText(thenM: number, nowM: number): { figure: string; res
   if (Math.abs(d) < 0.005) return { figure, rest: "marcaba hace un año, igual que hoy." };
   return { figure, rest: `marcaba hace un año. Hoy está ${cm(d)} más ${d > 0 ? "alto" : "bajo"}.` };
 }
+
+const WEEKDAYS = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"] as const;
+
+/** "sábado 21" a partir de "2026-11-21". Nunca "mañana": la página puede quedar abierta de un día para el otro. */
+export function dayLabel(date: string): { weekday: string; dayOfMonth: number } {
+  const d = new Date(`${date}T00:00:00Z`);
+  return { weekday: WEEKDAYS[d.getUTCDay()]!, dayOfMonth: d.getUTCDate() };
+}
+
+type Range = { date: string; loM: number; hiM: number };
+
+/**
+ * Qué dice el rango estimado sobre los niveles de Prefectura. Describe, nunca ordena: es una estimación propia
+ * comparada con un umbral, no un aviso.
+ */
+export function forecastLevelNote(days: Range[], s: Levels): string | null {
+  if (s.heightM === null) return null;
+  const levels: [number | null, string][] = [
+    [s.evacuationM, "evacuación"],
+    [s.alertM, "alerta"],
+  ];
+  for (const [m, name] of levels) {
+    if (m === null) continue;
+    const level = `nivel de ${name} de Prefectura (${fmtM(m)} m)`;
+    const on = (d: Range) => `${dayLabel(d.date).weekday} ${dayLabel(d.date).dayOfMonth}`;
+    if (s.heightM < m) {
+      const whole = days.find((d) => d.loM >= m);
+      const touch = days.find((d) => d.hiM >= m);
+      if (!touch) continue;
+      if (whole && whole.date === touch.date) return `El ${on(whole)} el rango queda entero por encima del ${level}.`;
+      if (whole) return `El ${on(touch)} el rango ya llega al ${level}; el ${on(whole)} queda entero por encima.`;
+      return `El ${on(touch)} el rango llega al ${level}.`;
+    } else {
+      const below = days.find((d) => d.hiM < m);
+      if (below) return `El ${on(below)} el rango queda entero por debajo del ${level}.`;
+    }
+  }
+  return null;
+}

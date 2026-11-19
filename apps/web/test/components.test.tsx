@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { describe, it, expect, afterEach } from "vitest";
 import { render, screen, cleanup } from "@testing-library/react";
+import { Forecast } from "@/components/Forecast";
 import { Hero } from "@/components/Hero";
 import { SourceFooter } from "@/components/SourceFooter";
 import { Upstream } from "@/components/Upstream";
@@ -103,5 +104,57 @@ describe("YearFacts: marcas pintadas", () => {
   it("sin lectura de hoy no muestra nada", () => {
     const { container } = render(<YearFacts rate={null} daysAboveAlert={null} lastYearM={3} nowM={null} />);
     expect(container.innerHTML).toBe("");
+  });
+});
+
+describe("Forecast: cómo puede seguir", () => {
+  const forecast = {
+    days: [
+      { date: "2026-11-20", ahead: 1, loM: 4.84, hiM: 4.95, maeM: 0.019, recentMaeM: 0.021 },
+      { date: "2026-11-22", ahead: 3, loM: 4.94, hiM: 5.09, maeM: 0.035, recentMaeM: 0.058 },
+    ],
+    coverage: 0.76,
+    tested: 180,
+    from: ["Diamante", "Santa Fe", "Paraná"],
+  };
+  // La frescura se mira en el navegador con la hora real: la lectura de la prueba tiene que ser de recién.
+  const fresh: StationDto = { ...victoria, ts: new Date(Date.now() - 3_600_000).toISOString() };
+  it("muestra un rango por día, nunca un número solo, y de dónde sale", () => {
+    const { container } = render(<Forecast forecast={forecast} station={fresh} />);
+    const t = document.body.textContent ?? "";
+    expect(container.querySelectorAll(".fc-band").length).toBe(2);
+    expect(t).toContain("viernes 20");
+    expect(t).toContain("4,84 a 4,95");
+    expect(t).toContain("domingo 22");
+    expect(t).toContain("lo que ya pasó en Diamante, Santa Fe y Paraná");
+  });
+  it("dice que no es oficial y publica cuánto le erra", () => {
+    render(<Forecast forecast={forecast} station={fresh} />);
+    const t = document.body.textContent ?? "";
+    expect(t).toContain("Una estimación propia, no oficial, del promedio de cada día");
+    expect(t).toContain("a 1 día, 2 cm; a 3 días, 4 cm");
+    expect(t).toContain("En las últimas semanas, con el río más movido, erró más: a 1 día, 2 cm; a 3 días, 6 cm.");
+    expect(t).toContain("dentro del rango el 76% de las veces");
+    expect(t).toContain("Instituto Nacional del Agua");
+  });
+  it("compara el rango con los niveles de Prefectura sin dar órdenes", () => {
+    render(<Forecast forecast={forecast} station={fresh} />);
+    const t = document.body.textContent ?? "";
+    expect(t).toContain("El viernes 20 el rango ya llega al nivel de evacuación de Prefectura (4,90 m); el domingo 22 queda entero por encima.");
+    expect(t).not.toMatch(/evacu(á|ar|en)\b/i);
+  });
+  it("si últimamente no erró más que en el promedio, no lo agrega", () => {
+    const calm = { ...forecast, days: forecast.days.map((d) => ({ ...d, recentMaeM: d.maeM / 2 })) };
+    render(<Forecast forecast={calm} station={fresh} />);
+    expect(document.body.textContent).not.toContain("En las últimas semanas");
+  });
+  it("se oculta aunque el servidor haya dicho stale:false si la lectura ya es vieja", () => {
+    const { container } = render(<Forecast forecast={forecast} station={{ ...victoria, ts: "2026-11-15T15:00:00.000Z", stale: false }} />);
+    expect(container.innerHTML).toBe("");
+  });
+  it("con dato viejo, sin lectura o sin estimación no muestra nada", () => {
+    expect(render(<Forecast forecast={forecast} station={{ ...fresh, ts: "2026-11-15T15:00:00.000Z", stale: true }} />).container.innerHTML).toBe("");
+    expect(render(<Forecast forecast={forecast} station={{ ...fresh, heightM: null }} />).container.innerHTML).toBe("");
+    expect(render(<Forecast forecast={null} station={fresh} />).container.innerHTML).toBe("");
   });
 });

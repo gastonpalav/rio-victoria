@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createTestDb } from "../src/testing";
 import {
-  upsertStations, upsertReadings, getStationBySlug, getStations, getSeries, startRun, finishRun, getLastRuns, getMaxSince, getDailyStats,
+  upsertStations, upsertReadings, getStationBySlug, getStations, getSeries, startRun, finishRun, getLastRuns, getMaxSince, getDailyStats, getWindowStats,
 } from "../src/db/repo";
 import type { Db } from "../src/db/client";
 import { currentRows } from "./helpers/rows";
@@ -109,5 +109,22 @@ describe("repo: máximo en un período", () => {
     expect(v[0]!.maxM).toBe(4.2);
     expect(v[1]!.day).toBe(v[0]!.day + 1);
     expect(m.get(230)).toHaveLength(1);
+  });
+
+  it("getWindowStats agrupa en tramos de 24 h que terminan en la última lectura", async () => {
+    await upsertReadings(db, 270, [
+      { ts: new Date("2026-11-16T12:00:00Z"), heightM: 3.0 }, // exactamente 48 h antes: cierra el tramo −1
+      { ts: new Date("2026-11-17T12:00:00Z"), heightM: 4.0 }, // exactamente 24 h antes: cierra el tramo −1
+      { ts: new Date("2026-11-17T12:00:01Z"), heightM: 4.2 },
+      { ts: new Date("2026-11-18T12:00:00Z"), heightM: 4.6 }, // la última: cierra el tramo 0
+      { ts: new Date("2026-11-18T15:00:00Z"), heightM: 9.9 }, // posterior: tramo 1
+    ], "tabla");
+    const m = await getWindowStats(db, [270], new Date("2026-11-01T00:00:00Z"), new Date("2026-11-18T12:00:00Z"));
+    const byDay = new Map(m.get(270)!.map((d) => [d.day, d]));
+    expect([...byDay.keys()]).toEqual([-2, -1, 0, 1]);
+    expect(byDay.get(-2)!.meanM).toBeCloseTo(3.0, 5);
+    expect(byDay.get(-1)!.meanM).toBeCloseTo(4.0, 5);
+    expect(byDay.get(0)!.meanM).toBeCloseTo(4.4, 5);
+    expect(byDay.get(0)!.maxM).toBeCloseTo(4.6, 5);
   });
 });

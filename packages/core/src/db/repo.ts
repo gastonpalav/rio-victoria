@@ -153,6 +153,29 @@ export async function getMaxSince(db: Db, stationId: number, since: Date): Promi
   return r ? { ts: new Date(r.ts), heightM: r.heightM } : null;
 }
 
+/**
+ * Como `getDailyStats`, pero en tramos de 24 h que terminan en `endsAt`: el tramo 0 son las últimas 24 h
+ * (incluida la lectura de `endsAt`), −1 las 24 anteriores, y así. Lo posterior a `endsAt` queda en tramos positivos.
+ */
+export async function getWindowStats(db: Db, stationIds: number[], since: Date, endsAt: Date): Promise<Map<number, Daily[]>> {
+  const out = new Map<number, Daily[]>();
+  if (stationIds.length === 0) return out;
+  const end = sql.raw(String(Math.floor(endsAt.getTime() / 1000))); // un entero nuestro: va en la consulta para poder agrupar por la expresión
+  const day = sql<number>`ceil((extract(epoch from ${readings.ts}) - ${end}) / 86400.0)::int`;
+  const rows = await db
+    .select({ stationId: readings.stationId, day, meanM: sql<number>`avg(${readings.heightM})::float8`, maxM: sql<number>`max(${readings.heightM})` })
+    .from(readings)
+    .where(and(inArray(readings.stationId, stationIds), gte(readings.ts, since)))
+    .groupBy(readings.stationId, day)
+    .orderBy(readings.stationId, day);
+  for (const r of rows) {
+    const list = out.get(r.stationId) ?? [];
+    list.push({ day: Number(r.day), meanM: Number(r.meanM), maxM: Number(r.maxM) });
+    out.set(r.stationId, list);
+  }
+  return out;
+}
+
 /** Promedio y máximo por día argentino (UTC−3) de varias estaciones desde `since`, ordenados por día. */
 export async function getDailyStats(db: Db, stationIds: number[], since: Date): Promise<Map<number, Daily[]>> {
   const out = new Map<number, Daily[]>();

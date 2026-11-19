@@ -61,3 +61,40 @@ describe("upstreamDelta", () => {
     expect(upstreamDelta({ heightM: 3, alertM: null, evacuationM: null })).toBeNull();
   });
 });
+
+describe("dayLabel", () => {
+  it("nombra el día de la semana sin depender de la zona horaria", async () => {
+    const { dayLabel } = await import("@/lib/copy");
+    expect(dayLabel("2026-11-21")).toEqual({ weekday: "sábado", dayOfMonth: 21 });
+  });
+});
+
+describe("forecastLevelNote", () => {
+  const days = [
+    { date: "2026-11-20", loM: 4.84, hiM: 4.95 },
+    { date: "2026-11-22", loM: 4.94, hiM: 5.09 },
+  ];
+  it("subiendo: dice cuándo el rango llega al nivel y cuándo queda entero por encima", async () => {
+    const { forecastLevelNote } = await import("@/lib/copy");
+    expect(forecastLevelNote(days, { heightM: 4.85, alertM: 4.6, evacuationM: 4.9 })).toBe(
+      "El viernes 20 el rango ya llega al nivel de evacuación de Prefectura (4,90 m); el domingo 22 queda entero por encima.",
+    );
+    expect(forecastLevelNote(days, { heightM: 4.85, alertM: 4.6, evacuationM: 5.0 })).toBe(
+      "El domingo 22 el rango llega al nivel de evacuación de Prefectura (5,00 m).",
+    );
+    expect(forecastLevelNote(days, { heightM: 4.5, alertM: 4.6, evacuationM: 5.9 })).toBe(
+      "El viernes 20 el rango queda entero por encima del nivel de alerta de Prefectura (4,60 m).",
+    );
+  });
+  it("bajando: dice cuándo queda entero por debajo", async () => {
+    const { forecastLevelNote } = await import("@/lib/copy");
+    expect(forecastLevelNote(days, { heightM: 5.2, alertM: 4.6, evacuationM: 5.1 })).toBe(
+      "El viernes 20 el rango queda entero por debajo del nivel de evacuación de Prefectura (5,10 m).",
+    );
+  });
+  it("lejos de los niveles, o sin niveles, no dice nada", async () => {
+    const { forecastLevelNote } = await import("@/lib/copy");
+    expect(forecastLevelNote(days, { heightM: 4.85, alertM: 6, evacuationM: 6.5 })).toBeNull();
+    expect(forecastLevelNote(days, { heightM: 4.85, alertM: null, evacuationM: null })).toBeNull();
+  });
+});

@@ -54,6 +54,7 @@ export async function getStationPage(slug: string) {
     travel: extras.travel,
     daysAboveAlert: extras.daysAboveAlert,
     lastYearM: extras.lastYearM,
+    forecast: extras.forecast,
     options: stations.map((s) => ({ slug: s.slug, name: s.name, river: s.river })),
     series: r.status === 200 ? r.body.readings : [],
     from,

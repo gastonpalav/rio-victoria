@@ -21,7 +21,7 @@ Contexto de arranque (18/11/2026 16:00): Victoria 4,85 m, creciendo, alerta 4,60
 
 - Avisos/notificaciones (Telegram, push, mails). Descartado: solo se entra a mirar.
 - Cuentas de usuario, favoritos en servidor.
-- Pronósticos numéricos propios. Se muestra lo que pasa aguas arriba, no se inventa una predicción.
+- ~~Pronósticos numéricos propios.~~ **Revisado el 2026-11-19 por pedido del autor:** se agrega "Cómo puede seguir", una estimación propia a 1, 3 y 5 días, con estas condiciones: siempre un rango, nunca un número solo; el error medido contra la propia historia va publicado al lado; se presenta como no oficial y con link al INA; no se muestra si el dato es viejo, si no hay puertos de arriba con relación clara o si el método no le gana a "queda igual" y a seguir la tendencia. Ver `packages/core/src/forecast.ts`.
 
 ## Anti-objetivos (cosas que lo harían un fracaso aunque "funcione")
 

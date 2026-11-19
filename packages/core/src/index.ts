@@ -8,3 +8,4 @@ export * from "./db/client";
 export * from "./db/repo";
 export * from "./domain";
 export * from "./river-stats";
+export * from "./forecast";

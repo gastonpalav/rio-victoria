@@ -426,6 +426,7 @@ a {
 
 /* ---------- Debajo de la pared: la misma pared sigue, a todo el ancho ---------- */
 .upstream,
+.forecast,
 .wind,
 .year,
 .footer {
@@ -490,6 +491,7 @@ a {
   padding-bottom: 12px;
 }
 .upstream h2,
+.forecast h2,
 .year h2,
 .page-simple h1 {
   margin: 0;
@@ -638,6 +640,145 @@ a.staff-cell:hover .staff-name {
 .staff-here .staff-name,
 .staff-here .staff-value {
   color: var(--paint);
+}
+
+/* ---------- Cómo puede seguir: una franja pintada por día, sobre el agua de hoy ---------- */
+.forecast {
+  padding-top: 56px;
+  padding-bottom: 8px;
+}
+.forecast-lede {
+  margin: 12px 0 0;
+  max-width: 44ch;
+  color: var(--paint-soft);
+  font-size: 15px;
+}
+.forecast-note {
+  margin: 14px 0 0;
+  max-width: 34ch;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+.fc-wrap {
+  margin-top: 24px;
+  max-width: 980px;
+}
+.fc {
+  position: relative;
+}
+.fc-cols {
+  position: relative;
+  z-index: 3;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+}
+.fc-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  min-width: 0;
+  padding: 0 4px;
+  text-align: center;
+}
+.fc-plot {
+  position: relative;
+  width: 100%;
+  height: var(--fc-h);
+  margin-bottom: 10px;
+}
+/* El agua de hoy, de lado a lado: las franjas se leen contra ella. */
+.fc-water {
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  background: linear-gradient(var(--river-top), var(--river) 35%, var(--river-deep));
+  border-top: 4px solid var(--river-line);
+  opacity: 0.8;
+}
+.fc-level {
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  height: 0;
+  margin-top: -2px;
+}
+.fc-level-evac {
+  border-top: 4px solid var(--evac-paint);
+}
+.fc-level-alert {
+  border-top: 4px dashed var(--alert-paint);
+}
+.fc-level span {
+  position: absolute;
+  left: 0;
+  bottom: 4px;
+  padding: 1px 5px 0;
+  background: var(--wall);
+  font: 800 12px var(--font-stencil), sans-serif;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.fc-level-evac span {
+  color: var(--evac-paint);
+}
+.fc-level-alert span {
+  color: var(--alert-paint);
+}
+/* La franja: pintura azul rayada, porque es un rango y no una medida. */
+.fc-band {
+  position: absolute;
+  left: 22%;
+  right: 22%;
+  border: 3px solid var(--paint);
+  background: repeating-linear-gradient(-45deg, var(--paint) 0 3px, var(--staff) 3px 8px);
+}
+.fc-day {
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1.15;
+}
+.fc-range {
+  font-family: var(--font-stencil), sans-serif;
+  font-size: clamp(18px, 4.6vw, 30px);
+  font-weight: 800;
+  line-height: 1.05;
+}
+/* En un celular el rango no entra en un renglón: parte entre el mínimo y "a máximo", nunca en el medio. */
+.fc-day span,
+.fc-range span:not(.sr-only) {
+  white-space: nowrap;
+}
+@media (max-width: 560px) {
+  /* Todas las columnas iguales: el día en un renglón y el número en otro; el rango, en dos. */
+  .fc-day span,
+  .fc-range span:not(.sr-only) {
+    display: block;
+  }
+}
+.forecast-proof {
+  margin: 18px 0 0;
+  max-width: 62ch;
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--paint-soft);
+}
+.forecast-proof + .forecast-proof {
+  margin-top: 8px;
+}
+.forecast-proof b {
+  color: var(--paint);
+}
+.forecast-proof a {
+  color: inherit;
 }
 
 /* ---------- Para comparar: marcas de crecientes pintadas en la pared ---------- */
