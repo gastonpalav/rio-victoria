@@ -22,7 +22,7 @@ export default async function EstadoPage() {
   return (
     <div className="page page-simple depth">
       <header className="topbar">
-        <a href="/" className="home" aria-label="regla, inicio">
+        <a href="/" className="home" aria-label="Inicio: el río en Victoria">
           <Logo />
         </a>
       </header>

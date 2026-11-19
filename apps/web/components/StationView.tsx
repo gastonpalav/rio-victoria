@@ -21,7 +21,7 @@ export async function StationView({ slug }: { slug: string }) {
   return (
     <div className="page">
       <header className="topbar">
-        <a href="/" className="home" aria-label="regla, inicio (Victoria)">
+        <a href="/" className="home" aria-label="Inicio: el río en Victoria">
           <Logo />
         </a>
         <div className="topbar-tools">

@@ -18,7 +18,7 @@ export function ShareImage({ slug, name }: { slug: string; name: string }) {
     file.current ??= fetch(`/${slug}/historia`)
       .then(async (res) => {
         if (!res.ok) throw new Error(String(res.status));
-        return new File([await res.blob()], `regla-${slug}.png`, { type: "image/png" });
+        return new File([await res.blob()], `rio-${slug}.png`, { type: "image/png" });
       })
       .catch((e) => {
         file.current = null;

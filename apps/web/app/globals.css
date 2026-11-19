@@ -63,13 +63,6 @@ a {
   align-items: center;
   gap: 8px;
 }
-.logo-word {
-  font-family: var(--font-stencil), sans-serif;
-  font-size: 32px;
-  font-weight: 800;
-  line-height: 1;
-  letter-spacing: 0.01em;
-}
 
 .topbar-tools {
   display: flex;

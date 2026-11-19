@@ -13,8 +13,8 @@ export type ImageFormat = "card" | "story";
 
 /** Medidas de cada formato: la tarjeta del link (horizontal) y la imagen para compartir (vertical). */
 const LAYOUT = {
-  card: { ...ogSize, staff: 64, markW: 38, labelX: 40, labelSize: 16, logo: 52, number: 270, unit: 30, lineText: 26, pad: 34 },
-  story: { ...storySize, staff: 96, markW: 58, labelX: 62, labelSize: 24, logo: 72, number: 400, unit: 38, lineText: 36, pad: 56 },
+  card: { ...ogSize, staff: 64, markW: 38, labelX: 40, labelSize: 16, number: 270, unit: 30, lineText: 26, pad: 34 },
+  story: { ...storySize, staff: 96, markW: 58, labelX: 62, labelSize: 24, number: 400, unit: 38, lineText: 36, pad: 56 },
 };
 
 
@@ -79,7 +79,7 @@ export async function stationOgImage(slug: string, format: ImageFormat = "card")
     return new ImageResponse(
       (
         <div style={{ ...base, alignItems: "center", padding: 80, fontSize: 64 }}>
-          <div style={{ display: "flex", ...ST, fontSize: 120 }}>regla</div>
+          <div style={{ display: "flex", ...ST, fontSize: 120 }}>Altura del río</div>
         </div>
       ),
       { ...size, fonts },
@@ -152,7 +152,6 @@ export async function stationOgImage(slug: string, format: ImageFormat = "card")
         {line(s.evacuationM, C.evac, false, `EVACUACIÓN ${s.evacuationM === null ? "" : fmtM(s.evacuationM)}`)}
         {line(s.alertM, C.alert, true, `ALERTA ${s.alertM === null ? "" : fmtM(s.alertM)}`)}
 
-        <div style={{ position: "absolute", left: STAFF_W + 26, top: 22, display: "flex", fontSize: L.logo, ...ST }}>regla</div>
 
         <div style={{ position: "absolute", right: L.pad, bottom: H - levelY + 6, display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
           <div style={{ display: "flex", fontSize: L.unit, color: C.paintSoft }}>metros en {s.name}</div>

@@ -174,7 +174,7 @@ export function Hero({ station: s, series = [], from, to, yearMax = null }: Prop
       <div
         className="staff"
         role="img"
-        aria-label={`Regla: el agua marca ${fmtM(heightM)} metros en ${s.name}.${s.alertM !== null && s.evacuationM !== null ? ` Nivel de alerta ${fmtM(s.alertM)}, nivel de evacuación ${fmtM(s.evacuationM)}.` : ""}`}
+        aria-label={`Escala hidrométrica: el agua marca ${fmtM(heightM)} metros en ${s.name}.${s.alertM !== null && s.evacuationM !== null ? ` Nivel de alerta ${fmtM(s.alertM)}, nivel de evacuación ${fmtM(s.evacuationM)}.` : ""}`}
       >
         <svg viewBox={`0 0 58 ${sc.span * 100}`} preserveAspectRatio="none" aria-hidden="true">
           <rect x={0} y={0} width={58} height={sc.span * 100} className="staff-enamel" />

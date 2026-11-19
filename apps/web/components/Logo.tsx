@@ -1,4 +1,4 @@
-/** Marca "regla": una regla hidrométrica (E) con el agua llegando. */
+/** Una escala hidrométrica (E) con el agua llegando. Sin nombre: el sitio es informativo, no un producto. */
 export function Logo({ size = 30 }: { size?: number }) {
   const w = (size * 22) / 30;
   return (
@@ -10,7 +10,6 @@ export function Logo({ size = 30 }: { size?: number }) {
         <rect x="5" y="14" width="12" height="3" fill="var(--ink)" />
         <rect x="0" y="21" width="22" height="9" fill="var(--water)" />
       </svg>
-      <span className="logo-word">regla</span>
     </span>
   );
 }
