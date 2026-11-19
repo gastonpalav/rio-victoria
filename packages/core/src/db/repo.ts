@@ -1,9 +1,10 @@
-import { and, asc, desc, eq, gte, lte, sql } from "drizzle-orm";
+import { and, asc, desc, eq, gte, inArray, lte, sql } from "drizzle-orm";
 import type { Db } from "./client";
 import { readings, scrapeRuns, stations } from "./schema";
 import type { CurrentRow } from "../parse-current";
 import { slugify } from "../slug";
 import { isHidden } from "../stations";
+import type { Daily } from "../river-stats";
 
 export type Station = typeof stations.$inferSelect;
 export type Point = { ts: Date; heightM: number };
@@ -150,4 +151,23 @@ export async function getMaxSince(db: Db, stationId: number, since: Date): Promi
     .orderBy(desc(readings.heightM), desc(readings.ts))
     .limit(1);
   return r ? { ts: new Date(r.ts), heightM: r.heightM } : null;
+}
+
+/** Promedio y máximo por día argentino (UTC−3) de varias estaciones desde `since`, ordenados por día. */
+export async function getDailyStats(db: Db, stationIds: number[], since: Date): Promise<Map<number, Daily[]>> {
+  const out = new Map<number, Daily[]>();
+  if (stationIds.length === 0) return out;
+  const day = sql<number>`floor((extract(epoch from ${readings.ts}) - 10800) / 86400)::int`;
+  const rows = await db
+    .select({ stationId: readings.stationId, day, meanM: sql<number>`avg(${readings.heightM})::float8`, maxM: sql<number>`max(${readings.heightM})` })
+    .from(readings)
+    .where(and(inArray(readings.stationId, stationIds), gte(readings.ts, since)))
+    .groupBy(readings.stationId, day)
+    .orderBy(readings.stationId, day);
+  for (const r of rows) {
+    const list = out.get(r.stationId) ?? [];
+    list.push({ day: Number(r.day), meanM: Number(r.meanM), maxM: Number(r.maxM) });
+    out.set(r.stationId, list);
+  }
+  return out;
 }

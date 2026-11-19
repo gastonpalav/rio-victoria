@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { StationDto } from "@/lib/api";
-import { fmtM, upstreamNote } from "@/lib/copy";
+import { fmtM, travelNote, upstreamNote } from "@/lib/copy";
+import type { Travel } from "@/lib/extras";
 import { StaleTag } from "./Freshness";
 
 const H = 220; // alto de cada regla en px
@@ -38,7 +39,7 @@ function MiniStaff({ s, here }: { s: StationDto; here: boolean }) {
 }
 
 /** El río baja de izquierda a derecha: los puertos de arriba y, al final, el que estás mirando. */
-export function Upstream({ stations, here }: { stations: StationDto[]; here?: StationDto }) {
+export function Upstream({ stations, here, travel = {} }: { stations: StationDto[]; here?: StationDto; travel?: Record<string, Travel> }) {
   if (stations.length === 0) return null;
   const row = [...stations].reverse().map((s) => ({ s, here: false }));
   if (here) row.push({ s: here, here: true });
@@ -46,8 +47,8 @@ export function Upstream({ stations, here }: { stations: StationDto[]; here?: St
     <section className="upstream">
       <h2>Lo que viene de arriba</h2>
       <p className="upstream-note">
-        Las reglas están alineadas en su línea de evacuación (la roja). El agua de los puertos de la izquierda llega a{" "}
-        {here?.name ?? "este puerto"} en los días siguientes.
+        Las reglas están alineadas en su línea de evacuación (la roja). Debajo de cada puerto, cuánto suele tardar en
+        notarse en {here?.name ?? "este puerto"} lo que pasa allá, según el último año de lecturas.
       </p>
       <ol className="staffs">
         {row.map(({ s, here: isHere }) => {
@@ -57,6 +58,7 @@ export function Upstream({ stations, here }: { stations: StationDto[]; here?: St
               <MiniStaff s={s} here={isHere} />
               <span className="staff-name">{isHere ? `${s.name} (acá)` : s.name}</span>
               <span className="staff-value">{s.heightM === null ? "—" : fmtM(s.heightM)}</span>
+              {!isHere && travel[s.slug] && <span className="staff-travel">{travelNote(travel[s.slug]!)}</span>}
               {note && <span className={s.level === "evacuacion" ? "staff-note staff-note-over" : "staff-note"}>{note}</span>}
               {s.ts && (
                 <span className="staff-note">

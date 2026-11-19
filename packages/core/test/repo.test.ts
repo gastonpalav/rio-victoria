@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createTestDb } from "../src/testing";
 import {
-  upsertStations, upsertReadings, getStationBySlug, getStations, getSeries, startRun, finishRun, getLastRuns, getMaxSince,
+  upsertStations, upsertReadings, getStationBySlug, getStations, getSeries, startRun, finishRun, getLastRuns, getMaxSince, getDailyStats,
 } from "../src/db/repo";
 import type { Db } from "../src/db/client";
 import { currentRows } from "./helpers/rows";
@@ -93,5 +93,21 @@ describe("repo: máximo en un período", () => {
     ], "tabla");
     expect(await getMaxSince(db, 260, new Date("2025-11-18T00:00:00Z"))).toEqual({ ts: new Date("2026-11-18T19:00:00Z"), heightM: 4.85 });
     expect(await getMaxSince(db, 280, new Date("2025-11-18T00:00:00Z"))).toBeNull();
+  });
+
+  it("getDailyStats agrupa por día argentino, con promedio y máximo, por estación", async () => {
+    await upsertReadings(db, 260, [
+      { ts: new Date("2026-11-17T12:00:00Z"), heightM: 4.0 },
+      { ts: new Date("2026-11-18T02:00:00Z"), heightM: 4.2 }, // 23 h del 17 en Argentina
+      { ts: new Date("2026-11-18T12:00:00Z"), heightM: 4.5 },
+    ], "tabla");
+    await upsertReadings(db, 230, [{ ts: new Date("2026-11-18T12:00:00Z"), heightM: 5.0 }], "tabla");
+    const m = await getDailyStats(db, [260, 230], new Date("2026-11-01T00:00:00Z"));
+    const v = m.get(260)!;
+    expect(v).toHaveLength(2);
+    expect(v[0]!.meanM).toBeCloseTo(4.1, 5);
+    expect(v[0]!.maxM).toBe(4.2);
+    expect(v[1]!.day).toBe(v[0]!.day + 1);
+    expect(m.get(230)).toHaveLength(1);
   });
 });

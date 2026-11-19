@@ -1,6 +1,8 @@
 import { cacheLife, cacheTag } from "next/cache";
-import { type Db, createDb, getMaxSince, getStationBySlug, upstreamOf } from "@rio/core";
-import { buildReadingsPayload, buildStationsPayload } from "./api";
+import { type Db, createDb, getMaxSince, getStations } from "@rio/core";
+import { buildReadingsPayload, buildStationsPayload, toDto } from "./api";
+import { buildExtras } from "./extras";
+import { fetchWind } from "./wind";
 
 export const READINGS_TAG = "readings";
 
@@ -32,26 +34,38 @@ export async function getStationPage(slug: string) {
   cacheLife({ stale: 60, revalidate: 300, expire: 3600 });
   cacheTag(READINGS_TAG, `readings-${slug}`);
   const now = new Date();
-  const { stations } = await buildStationsPayload(getDb(), now);
+  const raw = await getStations(getDb());
+  const stations = raw.map((s) => toDto(s, now));
   const station = stations.find((s) => s.slug === slug);
-  if (!station) return null;
-  const upstream = upstreamOf(
-    { ...station, hidden: false },
-    stations.map((s) => ({ ...s, hidden: false })),
-  );
+  const here = raw.find((s) => s.slug === slug);
+  if (!station || !here) return null;
   const to = now.toISOString();
   const from = new Date(now.getTime() - 7 * 86_400_000).toISOString();
-  const r = await buildReadingsPayload(getDb(), slug, from, to, now);
-  const max = await getMaxSince(getDb(), (await getStationBySlug(getDb(), slug))?.id ?? -1, new Date(now.getTime() - 365 * 86_400_000));
+  const [r, max, extras] = await Promise.all([
+    buildReadingsPayload(getDb(), slug, from, to, now),
+    getMaxSince(getDb(), here.id, new Date(now.getTime() - 365 * 86_400_000)),
+    buildExtras(getDb(), here, raw, now),
+  ]);
+  const upstream = extras.upstreamSlugs.flatMap((u) => stations.filter((s) => s.slug === u));
   return {
     yearMax: max ? { ts: max.ts.toISOString(), heightM: max.heightM } : null,
     station,
     upstream,
+    travel: extras.travel,
+    daysAboveAlert: extras.daysAboveAlert,
+    lastYearM: extras.lastYearM,
     options: stations.map((s) => ({ slug: s.slug, name: s.name, river: s.river })),
     series: r.status === 200 ? r.body.readings : [],
     from,
     to,
   };
+}
+
+/** Viento del puerto, de Open-Meteo. Caché de 30 min; si falla, no se muestra. */
+export async function getWind(slug: string) {
+  "use cache";
+  cacheLife({ stale: 300, revalidate: 1800, expire: 7200 });
+  return fetchWind(slug);
 }
 
 /** "Ahora" redondeado a 5 minutos, para que la caché se comparta entre pedidos. */

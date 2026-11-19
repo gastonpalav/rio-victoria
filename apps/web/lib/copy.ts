@@ -44,3 +44,24 @@ export function relativeAge(fromIso: string, now: Date): string {
   const d = Math.floor(h / 24);
   return `hace ${d} día${d === 1 ? "" : "s"}`;
 }
+
+/** Cuánto tarda en notarse acá lo que pasa en un puerto de arriba (un rango: es un promedio del último año). */
+export function travelNote(t: { minDays: number; maxDays: number }): string {
+  if (t.maxDays <= 1) return "llega acá en un día o menos";
+  if (t.minDays === t.maxDays) return `llega acá en unos ${t.maxDays} días`;
+  if (t.minDays === 0) return `llega acá en hasta ${t.maxDays} días`;
+  return `llega acá en ${t.minDays} a ${t.maxDays} días`;
+}
+
+export function rateText(mPerDay: number): { figure: string; rest: string } {
+  const c = Math.round(mPerDay * 100);
+  if (c === 0) return { figure: "Quieto", rest: "en los últimos 3 días" };
+  return { figure: `${c > 0 ? "+" : "−"}${Math.abs(c)} cm`, rest: "por día en los últimos 3 días" };
+}
+
+export function lastYearText(thenM: number, nowM: number): { figure: string; rest: string } {
+  const d = nowM - thenM;
+  const figure = `${fmtM(thenM)} m`;
+  if (Math.abs(d) < 0.005) return { figure, rest: "marcaba hace un año, igual que hoy." };
+  return { figure, rest: `marcaba hace un año. Hoy está ${cm(d)} más ${d > 0 ? "alto" : "bajo"}.` };
+}

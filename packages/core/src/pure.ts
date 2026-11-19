@@ -2,3 +2,4 @@
 export * from "./domain";
 export * from "./time";
 export * from "./slug";
+export * from "./river-stats";

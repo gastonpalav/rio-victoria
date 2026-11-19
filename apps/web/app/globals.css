@@ -396,8 +396,9 @@ a {
   margin: 28px 0 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 8px;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 6px;
 }
 .staff-cell {
   display: flex;
@@ -445,9 +446,74 @@ a.staff-cell:hover .staff-name {
   color: var(--paint-soft);
   line-height: 1.25;
 }
+.staff-travel {
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--river-line);
+}
 .staff-note-over {
   color: var(--evac-paint);
   font-weight: 700;
+}
+
+/* ---------- El viento ---------- */
+.wind {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 22px 16px 0;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 17px;
+}
+.wind p {
+  margin: 0;
+  max-width: 52ch;
+}
+.wind-arrow {
+  flex: none;
+  fill: var(--paint);
+}
+.wind-sudestada .wind-arrow {
+  fill: var(--alert-paint);
+}
+.wind-sudestada p {
+  font-weight: 700;
+}
+
+/* ---------- El último año ---------- */
+.year {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 36px 16px 8px;
+}
+.year h2 {
+  margin: 0;
+  font-family: var(--font-stencil), sans-serif;
+  font-size: clamp(40px, 12vw, 64px);
+  font-weight: 800;
+  line-height: 0.92;
+}
+.facts {
+  list-style: none;
+  margin: 18px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  font-size: 18px;
+  line-height: 1.3;
+}
+.facts li {
+  max-width: 34ch;
+}
+.fact-figure {
+  font-family: var(--font-stencil), sans-serif;
+  font-size: 46px;
+  font-weight: 800;
+  line-height: 0.9;
+  vertical-align: -0.12em;
 }
 
 /* ---------- Pie ---------- */
