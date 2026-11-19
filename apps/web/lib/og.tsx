@@ -1,7 +1,6 @@
 import { ImageResponse } from "next/og";
 import { formatArt } from "@rio/core";
-import { rangeHeadline, RANGES } from "./chart";
-import { fmtM, levelSentence, TREND_LABEL } from "./copy";
+import { fmtM, TREND_LABEL } from "./copy";
 import { getStationPage } from "./data";
 import { heroScale } from "./scale";
 import { buildSurface } from "./surface";
@@ -18,11 +17,6 @@ const LAYOUT = {
   story: { ...storySize, staff: 96, markW: 58, labelX: 62, labelSize: 24, logo: 72, number: 400, unit: 38, lineText: 36, pad: 56 },
 };
 
-/** Dirección pública del sitio, para escribirla en la imagen (una captura circula sin el link). */
-function siteHost(): string {
-  const url = process.env.SITE_URL ?? (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : "");
-  return url.replace(/^https?:\/\//, "").replace(/\/$/, "");
-}
 
 // Los mismos colores de la pared (ImageResponse no lee variables CSS).
 const C = {
@@ -35,7 +29,6 @@ const C = {
   riverLine: "#5C3D20",
   glint: "#F6E7CC",
   onRiver: "#FFF8EF",
-  onRiverSoft: "#F3E1C7",
   evac: "#C0121F",
   alert: "#A85F00",
   staff: "#FFFFFF",
@@ -166,20 +159,11 @@ export async function stationOgImage(slug: string, format: ImageFormat = "card")
           <div style={{ display: "flex", fontSize: L.number, lineHeight: 0.8, ...ST }}>{fmtM(heightM)}</div>
         </div>
 
-        {format === "card" ? (
+        {/* La imagen vertical va limpia: solo la pared y los niveles, sin frases. */}
+        {format === "card" && (
           <div style={{ position: "absolute", left: STAFF_W + 26, right: L.pad, bottom: 26, display: "flex", flexDirection: "column", color: C.onRiver }}>
             {s.trend && <div style={{ display: "flex", fontSize: 54, ...ST }}>{TREND_LABEL[s.trend]}</div>}
             <div style={{ display: "flex", fontSize: 24 }}>{when}. Sitio no oficial.</div>
-          </div>
-        ) : (
-          <div style={{ position: "absolute", left: STAFF_W + 40, right: L.pad, bottom: 64, display: "flex", flexDirection: "column", color: C.onRiver }}>
-            {page.series.length > 1 && (
-              <div style={{ display: "flex", fontSize: 84, lineHeight: 1, ...ST }}>{rangeHeadline(page.series, RANGES[0]!)}</div>
-            )}
-            {s.trend && <div style={{ display: "flex", fontSize: 44, marginTop: 14 }}>{TREND_LABEL[s.trend]}</div>}
-            {levelSentence(s) && <div style={{ display: "flex", fontSize: 40, marginTop: 12, lineHeight: 1.25 }}>{levelSentence(s)}</div>}
-            <div style={{ display: "flex", fontSize: 30, marginTop: 28, color: C.onRiverSoft }}>{when}. Sitio no oficial.</div>
-            {siteHost() && <div style={{ display: "flex", fontSize: 52, marginTop: 30, ...ST }}>{siteHost()}</div>}
           </div>
         )}
       </div>
