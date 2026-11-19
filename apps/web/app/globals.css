@@ -364,6 +364,44 @@ a {
   text-decoration-thickness: 3px;
   text-underline-offset: 6px;
 }
+/* Compartir: un rectángulo pintado con el color del texto del agua, sin píldora. */
+.share {
+  margin-top: 4px;
+}
+.share button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 2.5px solid var(--on-river);
+  border-radius: 0;
+  background: transparent;
+  color: var(--on-river);
+  font: 800 19px var(--font-stencil), sans-serif;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.share button:hover {
+  background: var(--on-river);
+  color: var(--river-deep);
+}
+.share button:focus-visible {
+  outline: 3px solid var(--on-river);
+  outline-offset: 3px;
+}
+.share button:active {
+  transform: translateY(1px);
+}
+.share button:disabled {
+  cursor: progress;
+  opacity: 0.75;
+}
+.share-error {
+  margin: 6px 0 0;
+  font-weight: 700;
+}
 .range-error {
   margin: 0;
   font-weight: 700;

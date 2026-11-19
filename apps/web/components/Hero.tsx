@@ -7,6 +7,7 @@ import { TREND_LABEL, changeSentence, fmtM, levelSentence } from "@/lib/copy";
 import { heroScale } from "@/lib/scale";
 import { buildSurface } from "@/lib/surface";
 import { ReadingMeta, StaleBanner } from "./Freshness";
+import { ShareImage } from "./ShareImage";
 import { TrendIcon } from "./TrendIcon";
 
 type Props = {
@@ -256,6 +257,7 @@ export function Hero({ station: s, series = [], from, to, yearMax = null }: Prop
             {error}
           </p>
         )}
+        <ShareImage slug={s.slug} name={s.name} />
       </div>
     </section>
   );

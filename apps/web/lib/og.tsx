@@ -1,14 +1,28 @@
 import { ImageResponse } from "next/og";
 import { formatArt } from "@rio/core";
-import { fmtM, TREND_LABEL } from "./copy";
+import { rangeHeadline, RANGES } from "./chart";
+import { fmtM, levelSentence, TREND_LABEL } from "./copy";
 import { getStationPage } from "./data";
 import { heroScale } from "./scale";
 import { buildSurface } from "./surface";
 
 export const ogSize = { width: 1200, height: 630 };
-const W = ogSize.width;
-const H = ogSize.height;
-const STAFF_W = 64;
+/** Imagen vertical para estados de WhatsApp e historias: la pared a pantalla completa, como en el celular. */
+export const storySize = { width: 1080, height: 1920 };
+
+export type ImageFormat = "card" | "story";
+
+/** Medidas de cada formato: la tarjeta del link (horizontal) y la imagen para compartir (vertical). */
+const LAYOUT = {
+  card: { ...ogSize, staff: 64, markW: 38, labelX: 40, labelSize: 16, logo: 52, number: 270, unit: 30, lineText: 26, pad: 34 },
+  story: { ...storySize, staff: 96, markW: 58, labelX: 62, labelSize: 24, logo: 72, number: 400, unit: 38, lineText: 36, pad: 56 },
+};
+
+/** Dirección pública del sitio, para escribirla en la imagen (una captura circula sin el link). */
+function siteHost(): string {
+  const url = process.env.SITE_URL ?? (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : "");
+  return url.replace(/^https?:\/\//, "").replace(/\/$/, "");
+}
 
 // Los mismos colores de la pared (ImageResponse no lee variables CSS).
 const C = {
@@ -21,6 +35,7 @@ const C = {
   riverLine: "#5C3D20",
   glint: "#F6E7CC",
   onRiver: "#FFF8EF",
+  onRiverSoft: "#F3E1C7",
   evac: "#C0121F",
   alert: "#A85F00",
   staff: "#FFFFFF",
@@ -44,10 +59,16 @@ async function loadFont(family: string): Promise<ArrayBuffer | null> {
 }
 
 /**
- * La tarjeta que aparece al compartir el link: la misma pared, con el agua de la última semana.
- * Lleva la hora de la lectura para que un link viejo no parezca actual.
+ * La pared con el agua de la última semana, en dos formatos: la tarjeta que aparece al compartir el link
+ * y la imagen vertical del botón "Compartir imagen".
+ * Lleva la hora de la lectura para que una imagen vieja no parezca actual.
  */
-export async function stationOgImage(slug: string) {
+export async function stationOgImage(slug: string, format: ImageFormat = "card") {
+  const L = LAYOUT[format];
+  const W = L.width;
+  const H = L.height;
+  const STAFF_W = L.staff;
+  const size = { width: W, height: H };
   const page = await getStationPage(slug);
   const s = page?.station;
   const [stencil, body] = await Promise.all([
@@ -68,7 +89,7 @@ export async function stationOgImage(slug: string) {
           <div style={{ display: "flex", ...ST, fontSize: 120 }}>regla</div>
         </div>
       ),
-      { ...ogSize, fonts },
+      { ...size, fonts },
     );
   }
 
@@ -94,7 +115,9 @@ export async function stationOgImage(slug: string) {
   for (let d = Math.round(sc.bottom * 10); d < Math.round(sc.top * 10); d++) {
     const y = (sc.top - (d + 1) / 10) * pxPerM;
     const u = pxPerM * 0.05;
-    marks.push(`M0 ${y}h12v${u}h-12z`, `M12 ${y}h26v${u / 5}h-26z`, `M12 ${y + (2 * u) / 5}h26v${u / 5}h-26z`, `M12 ${y + (4 * u) / 5}h26v${u / 5}h-26z`);
+    const b = L.markW * 0.3;
+    const p = L.markW - b;
+    marks.push(`M0 ${y}h${b}v${u}h-${b}z`, `M${b} ${y}h${p}v${u / 5}h-${p}z`, `M${b} ${y + (2 * u) / 5}h${p}v${u / 5}h-${p}z`, `M${b} ${y + (4 * u) / 5}h${p}v${u / 5}h-${p}z`);
     if (d % 2 === 0) labels.push({ y: yOf(d / 10), text: (d / 10).toFixed(1).replace(".", ",") });
   }
 
@@ -102,7 +125,7 @@ export async function stationOgImage(slug: string) {
     h === null ? null : (
       <div style={{ position: "absolute", left: STAFF_W, right: 0, top: yOf(h) - 3, display: "flex", flexDirection: "column" }}>
         <div style={{ display: "flex", height: 0, borderTop: `${dashed ? 5 : 6}px ${dashed ? "dashed" : "solid"} ${color}` }} />
-        <div style={{ display: "flex", alignSelf: "flex-start", marginLeft: 14, marginTop: 6, padding: "0 6px", background: C.wall, color, fontSize: 26, ...ST, letterSpacing: 1 }}>
+        <div style={{ display: "flex", alignSelf: "flex-start", marginLeft: 14, marginTop: 6, padding: "0 6px", background: C.wall, color, fontSize: L.lineText, ...ST, letterSpacing: 1 }}>
           {text}
         </div>
       </div>
@@ -128,7 +151,7 @@ export async function stationOgImage(slug: string) {
           <path d={toPath(surface)} fill="none" stroke={C.glint} strokeWidth={2} strokeDasharray="4 60 18 110" strokeLinecap="round" />
         </svg>
         {labels.map((l) => (
-          <div key={l.text} style={{ position: "absolute", left: 40, top: l.y - 9, display: "flex", fontSize: 16, ...ST, color: C.paint }}>
+          <div key={l.text} style={{ position: "absolute", left: L.labelX, top: l.y - L.labelSize * 0.55, display: "flex", fontSize: L.labelSize, ...ST, color: C.paint }}>
             {l.text}
           </div>
         ))}
@@ -136,19 +159,31 @@ export async function stationOgImage(slug: string) {
         {line(s.evacuationM, C.evac, false, `EVACUACIÓN ${s.evacuationM === null ? "" : fmtM(s.evacuationM)}`)}
         {line(s.alertM, C.alert, true, `ALERTA ${s.alertM === null ? "" : fmtM(s.alertM)}`)}
 
-        <div style={{ position: "absolute", left: STAFF_W + 26, top: 22, display: "flex", fontSize: 52, ...ST }}>regla</div>
+        <div style={{ position: "absolute", left: STAFF_W + 26, top: 22, display: "flex", fontSize: L.logo, ...ST }}>regla</div>
 
-        <div style={{ position: "absolute", right: 34, bottom: H - levelY + 6, display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
-          <div style={{ display: "flex", fontSize: 30, color: C.paintSoft }}>metros en {s.name}</div>
-          <div style={{ display: "flex", fontSize: 270, lineHeight: 0.8, ...ST }}>{fmtM(heightM)}</div>
+        <div style={{ position: "absolute", right: L.pad, bottom: H - levelY + 6, display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
+          <div style={{ display: "flex", fontSize: L.unit, color: C.paintSoft }}>metros en {s.name}</div>
+          <div style={{ display: "flex", fontSize: L.number, lineHeight: 0.8, ...ST }}>{fmtM(heightM)}</div>
         </div>
 
-        <div style={{ position: "absolute", left: STAFF_W + 26, right: 34, bottom: 26, display: "flex", flexDirection: "column", color: C.onRiver }}>
-          {s.trend && <div style={{ display: "flex", fontSize: 54, ...ST }}>{TREND_LABEL[s.trend]}</div>}
-          <div style={{ display: "flex", fontSize: 24 }}>{when}. Sitio no oficial.</div>
-        </div>
+        {format === "card" ? (
+          <div style={{ position: "absolute", left: STAFF_W + 26, right: L.pad, bottom: 26, display: "flex", flexDirection: "column", color: C.onRiver }}>
+            {s.trend && <div style={{ display: "flex", fontSize: 54, ...ST }}>{TREND_LABEL[s.trend]}</div>}
+            <div style={{ display: "flex", fontSize: 24 }}>{when}. Sitio no oficial.</div>
+          </div>
+        ) : (
+          <div style={{ position: "absolute", left: STAFF_W + 40, right: L.pad, bottom: 64, display: "flex", flexDirection: "column", color: C.onRiver }}>
+            {page.series.length > 1 && (
+              <div style={{ display: "flex", fontSize: 84, lineHeight: 1, ...ST }}>{rangeHeadline(page.series, RANGES[0]!)}</div>
+            )}
+            {s.trend && <div style={{ display: "flex", fontSize: 44, marginTop: 14 }}>{TREND_LABEL[s.trend]}</div>}
+            {levelSentence(s) && <div style={{ display: "flex", fontSize: 40, marginTop: 12, lineHeight: 1.25 }}>{levelSentence(s)}</div>}
+            <div style={{ display: "flex", fontSize: 30, marginTop: 28, color: C.onRiverSoft }}>{when}. Sitio no oficial.</div>
+            {siteHost() && <div style={{ display: "flex", fontSize: 52, marginTop: 30, ...ST }}>{siteHost()}</div>}
+          </div>
+        )}
       </div>
     ),
-    { ...ogSize, fonts },
+    { ...size, fonts },
   );
 }
