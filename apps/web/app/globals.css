@@ -128,7 +128,7 @@ a {
   border-radius: 0;
   background: transparent;
   color: var(--paint);
-  font: 800 19px var(--font-stencil), sans-serif;
+  font: 800 19px var(--font-display), sans-serif;
   letter-spacing: 0.02em;
   text-overflow: ellipsis;
 }
@@ -195,7 +195,7 @@ a {
   position: absolute;
   left: 34px;
   transform: translateY(50%);
-  font-family: var(--font-stencil), sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-size: 13px;
   font-weight: 800;
   color: var(--mark);
@@ -299,7 +299,7 @@ a {
   top: 7px;
   padding: 0 5px;
   background: var(--wall);
-  font-family: var(--font-stencil), sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-size: 19px;
   font-weight: 800;
   letter-spacing: 0.03em;
@@ -341,7 +341,7 @@ a {
   max-width: calc(100% - 80px);
 }
 .big-number {
-  font-family: var(--font-stencil), sans-serif;
+  font-family: var(--font-display), sans-serif;
   /* Nunca más alta que el lugar sobre el agua: si no, se mete debajo del selector de puerto. */
   font-size: max(64px, min(clamp(130px, 42vw, 300px), var(--number-room)));
   font-weight: 800;
@@ -386,7 +386,7 @@ a {
 }
 .headline {
   margin: 0;
-  font-family: var(--font-stencil), sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-size: 30px;
   font-weight: 800;
   line-height: 1;
@@ -467,7 +467,7 @@ a {
 }
 .sock-n {
   fill: var(--paint);
-  font: 800 13px var(--font-stencil), sans-serif;
+  font: 800 13px var(--font-display), sans-serif;
   text-anchor: middle;
 }
 .sock-red {
@@ -503,7 +503,7 @@ a {
 .year h2,
 .page-simple h1 {
   margin: 0;
-  font-family: var(--font-stencil), sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-size: clamp(46px, 13vw, 104px);
   font-weight: 800;
   line-height: 0.88;
@@ -584,7 +584,7 @@ a.staff-cell:hover .staff-name {
   max-width: 100%;
 }
 .staff-value {
-  font-family: var(--font-stencil), sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-size: clamp(28px, 8vw, 48px);
   font-weight: 800;
   line-height: 0.95;
@@ -596,7 +596,7 @@ a.staff-cell:hover .staff-name {
 }
 .staff-delta b {
   display: block;
-  font-family: var(--font-stencil), sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-size: 19px;
   font-weight: 800;
   line-height: 1;
@@ -631,7 +631,7 @@ a.staff-cell:hover .staff-name {
   padding: 2px 7px 1px;
   background: var(--paint);
   color: var(--wall);
-  font: 800 15px var(--font-stencil), sans-serif;
+  font: 800 15px var(--font-display), sans-serif;
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
@@ -730,7 +730,7 @@ a.staff-cell:hover .staff-name {
   bottom: 4px;
   padding: 1px 5px 0;
   background: var(--wall);
-  font: 800 12px var(--font-stencil), sans-serif;
+  font: 800 12px var(--font-display), sans-serif;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   white-space: nowrap;
@@ -755,7 +755,7 @@ a.staff-cell:hover .staff-name {
   line-height: 1.15;
 }
 .fc-range {
-  font-family: var(--font-stencil), sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-size: clamp(18px, 4.6vw, 30px);
   font-weight: 800;
   line-height: 1.05;
@@ -817,7 +817,7 @@ a.staff-cell:hover .staff-name {
   width: 26px;
   height: 26px;
   border: 2.5px solid var(--paint);
-  font-family: var(--font-stencil), sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-size: 20px;
   line-height: 1;
 }
@@ -838,7 +838,7 @@ a.staff-cell:hover .staff-name {
 }
 .fc-formula p {
   margin: 0;
-  font-family: var(--font-stencil), sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-size: clamp(24px, 6.4vw, 36px);
   font-weight: 800;
   line-height: 1.1;
@@ -905,7 +905,7 @@ a.staff-cell:hover .staff-name {
   left: 25px;
   top: 50%;
   transform: translateY(-50%);
-  font: 800 12px var(--font-stencil), sans-serif;
+  font: 800 12px var(--font-display), sans-serif;
   color: var(--mark);
 }
 /* El agua de hoy: llega hasta la línea HOY y se ve por encima de la regla, como en la costa. */
@@ -955,7 +955,7 @@ a.staff-cell:hover .staff-name {
   gap: 1px;
 }
 .mark-title {
-  font-family: var(--font-stencil), sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-size: 24px;
   font-weight: 800;
   line-height: 1;
@@ -997,7 +997,7 @@ a.staff-cell:hover .staff-name {
 .footer .footer-sign {
   margin: 0 0 18px;
   max-width: none;
-  font-family: var(--font-stencil), sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-size: clamp(52px, 15vw, 140px);
   font-weight: 800;
   line-height: 0.82;

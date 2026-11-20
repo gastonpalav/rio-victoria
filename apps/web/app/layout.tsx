@@ -1,10 +1,10 @@
 import type { Metadata, Viewport } from "next";
-import { Atkinson_Hyperlegible_Next, Big_Shoulders_Stencil } from "next/font/google";
+import { Atkinson_Hyperlegible_Next, Big_Shoulders } from "next/font/google";
 import "../styles/tokens.css";
 import "./globals.css";
 
 const body = Atkinson_Hyperlegible_Next({ subsets: ["latin"], variable: "--font-body", display: "swap" });
-const stencil = Big_Shoulders_Stencil({ subsets: ["latin"], variable: "--font-stencil", display: "swap" });
+const display = Big_Shoulders({ subsets: ["latin"], variable: "--font-display", display: "swap" });
 
 export const metadata: Metadata = {
   metadataBase: new URL(
@@ -23,7 +23,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es-AR" className={`${body.variable} ${stencil.variable}`}>
+    <html lang="es-AR" className={`${body.variable} ${display.variable}`}>
       <body>{children}</body>
     </html>
   );

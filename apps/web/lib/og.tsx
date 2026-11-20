@@ -65,7 +65,7 @@ export async function stationOgImage(slug: string, format: ImageFormat = "card")
   const page = await getStationPage(slug);
   const s = page?.station;
   const [stencil, body] = await Promise.all([
-    loadFont("Big+Shoulders+Stencil:wght@800"),
+    loadFont("Big+Shoulders:wght@800"),
     loadFont("Atkinson+Hyperlegible+Next:wght@700"),
   ]);
   const fonts = [
