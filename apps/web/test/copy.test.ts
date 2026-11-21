@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { cm } from "@/lib/copy";
+import { cm, inaLevelNote, inaRunLabel, inaWeekLabel } from "@/lib/copy";
 
 describe("cm", () => {
   it("menos de un metro en centímetros", () => {
@@ -96,5 +96,31 @@ describe("forecastLevelNote", () => {
     const { forecastLevelNote } = await import("@/lib/copy");
     expect(forecastLevelNote(days, { heightM: 4.85, alertM: 6, evacuationM: 6.5 })).toBeNull();
     expect(forecastLevelNote(days, { heightM: 4.85, alertM: null, evacuationM: null })).toBeNull();
+  });
+});
+
+describe("inaWeekLabel", () => {
+  it("en hora argentina y con el último día incluido", () => {
+    expect(inaWeekLabel({ start: "2026-11-20T03:00:00.000Z", end: "2026-11-27T03:00:00.000Z" })).toBe("20 al 26 nov");
+    expect(inaWeekLabel({ start: "2026-11-27T03:00:00.000Z", end: "2026-12-04T03:00:00.000Z" })).toBe("27 nov al 3 dic");
+    expect(inaWeekLabel({ start: "2026-12-25T03:00:00.000Z", end: "2027-01-01T03:00:00.000Z" })).toBe("25 al 31 dic");
+  });
+});
+
+describe("inaRunLabel", () => {
+  it("día y mes en hora argentina", () => {
+    expect(inaRunLabel("2026-11-20T03:00:00.000Z")).toBe("20/11");
+    expect(inaRunLabel("2026-11-20T02:00:00.000Z")).toBe("19/11");
+  });
+});
+
+describe("inaLevelNote", () => {
+  const s = { alertM: 4.6, evacuationM: 5.9 };
+  it("describe sin ordenar, primero evacuación", () => {
+    expect(inaLevelNote({ loM: 5.3, hiM: 5.43 }, s)).toBe("por encima del nivel de alerta (4,60 m)");
+    expect(inaLevelNote({ loM: 4.5, hiM: 4.7 }, s)).toBe("llega al nivel de alerta (4,60 m)");
+    expect(inaLevelNote({ loM: 5.8, hiM: 5.99 }, s)).toBe("llega al nivel de evacuación (5,90 m)");
+    expect(inaLevelNote({ loM: 4.0, hiM: 4.2 }, s)).toBeNull();
+    expect(inaLevelNote({ loM: 5, hiM: 5 }, { alertM: null, evacuationM: null })).toBeNull();
   });
 });

@@ -120,3 +120,39 @@ export function forecastLevelNote(days: Range[], s: Levels): string | null {
   }
   return null;
 }
+
+const MONTHS = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"] as const;
+const AR_OFFSET_MS = 3 * 3_600_000; // Argentina es UTC−3 todo el año
+const ar = (iso: string, minusMs = 0) => new Date(Date.parse(iso) - AR_OFFSET_MS - minusMs);
+
+/** "20 al 26 nov", "27 nov al 3 dic": una semana del INA en hora argentina, con su último día incluido. */
+export function inaWeekLabel(w: { start: string; end: string }): string {
+  const a = ar(w.start);
+  const b = ar(w.end, 1); // `end` es exclusivo: la semana termina el día anterior
+  const sameMonth = a.getUTCMonth() === b.getUTCMonth() && a.getUTCFullYear() === b.getUTCFullYear();
+  const from = sameMonth ? `${a.getUTCDate()}` : `${a.getUTCDate()} ${MONTHS[a.getUTCMonth()]}`;
+  return `${from} al ${b.getUTCDate()} ${MONTHS[b.getUTCMonth()]}`;
+}
+
+/** "20/11": el día de la corrida del INA, en hora argentina. */
+export function inaRunLabel(runDate: string): string {
+  const d = ar(runDate);
+  return `${d.getUTCDate()}/${d.getUTCMonth() + 1}`;
+}
+
+/** Qué dice una semana del INA sobre los niveles de Prefectura. Describe, nunca ordena. */
+export function inaLevelNote(
+  w: { loM: number; hiM: number },
+  s: { alertM: number | null; evacuationM: number | null },
+): string | null {
+  const levels: [number | null, string][] = [
+    [s.evacuationM, "evacuación"],
+    [s.alertM, "alerta"],
+  ];
+  for (const [m, name] of levels) {
+    if (m === null) continue;
+    if (w.loM >= m) return `por encima del nivel de ${name} (${fmtM(m)} m)`;
+    if (w.hiM >= m) return `llega al nivel de ${name} (${fmtM(m)} m)`;
+  }
+  return null;
+}
