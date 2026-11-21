@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Atkinson_Hyperlegible_Next, Big_Shoulders } from "next/font/google";
+import { AutoRefresh } from "@/components/AutoRefresh";
 import "../styles/tokens.css";
 import "./globals.css";
 
@@ -24,7 +25,10 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es-AR" className={`${body.variable} ${display.variable}`}>
-      <body>{children}</body>
+      <body>
+        {children}
+        <AutoRefresh />
+      </body>
     </html>
   );
 }
