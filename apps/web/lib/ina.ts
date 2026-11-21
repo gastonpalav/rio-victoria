@@ -18,14 +18,21 @@ const isObj = (x: unknown): x is Record<string, unknown> => typeof x === "object
 const isDate = (x: unknown): x is string => typeof x === "string" && !Number.isNaN(Date.parse(x));
 const toCm = (m: number) => Math.round(m * 100) / 100;
 
-/** El id del INA de un puerto de Prefectura: el INA guarda el id de Prefectura en `id_externo`. */
-export function inaStationId(stations: unknown, prefectureId: number): number | null {
+/**
+ * id de Prefectura → id del INA. El INA guarda el id de Prefectura en `id_externo`; solo se cruzan sus escalas de
+ * Prefectura (`tabla: "alturas_prefe"`), para que un id de otra red nunca traiga los datos de otro puerto.
+ */
+export type InaStations = Record<number, number>;
+export function inaStationMap(stations: unknown): InaStations | null {
   if (!Array.isArray(stations)) return null;
+  const out: InaStations = {};
   for (const s of stations) {
-    if (!isObj(s) || typeof s.id !== "number" || s.id_externo === null || s.id_externo === undefined) continue;
-    if (Number(s.id_externo) === prefectureId) return s.id;
+    if (!isObj(s) || typeof s.id !== "number" || s.tabla !== "alturas_prefe") continue;
+    if (typeof s.id_externo !== "string" && typeof s.id_externo !== "number") continue;
+    const pna = Number(s.id_externo);
+    if (Number.isInteger(pna)) out[pna] = s.id;
   }
-  return null;
+  return Object.keys(out).length === 0 ? null : out;
 }
 
 /**
@@ -65,12 +72,19 @@ async function getJson(url: string): Promise<unknown> {
   return res.json();
 }
 
-/** La última corrida para un puerto de Prefectura; null si el INA no lo cubre o algo falla. */
-export async function fetchIna(prefectureId: number): Promise<InaForecast | null> {
+/** Los puertos de Prefectura que conoce el INA: es la misma lista para todos, se pide una vez. null si falla. */
+export async function fetchInaStations(): Promise<InaStations | null> {
   try {
-    const id = inaStationId(await getJson(`${INA_API}/obs/puntual/estaciones?tabla=alturas_prefe`), prefectureId);
-    if (id === null) return null;
-    return parseInaRun(await getJson(`${INA_API}/sim/calibrados/${MODEL}/corridas/last?includeProno=true&estacion_id=${id}`));
+    return inaStationMap(await getJson(`${INA_API}/obs/puntual/estaciones?tabla=alturas_prefe`));
+  } catch {
+    return null;
+  }
+}
+
+/** La última corrida para un puerto (id del INA); null si no tiene pronóstico o algo falla. */
+export async function fetchInaRun(inaId: number): Promise<InaForecast | null> {
+  try {
+    return parseInaRun(await getJson(`${INA_API}/sim/calibrados/${MODEL}/corridas/last?includeProno=true&estacion_id=${inaId}`));
   } catch {
     return null;
   }

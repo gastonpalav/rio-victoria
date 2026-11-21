@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { readFileSync } from "node:fs";
-import { fetchIna, inaFor, inaStationId, parseInaRun } from "@/lib/ina";
+import { fetchInaRun, fetchInaStations, inaFor, inaStationMap, parseInaRun } from "@/lib/ina";
 
 const read = (f: string) => JSON.parse(readFileSync(new URL(`./fixtures/${f}`, import.meta.url), "utf8"));
 const estaciones = read("ina-estaciones.json");
@@ -11,14 +11,17 @@ const p = (start: string, end: string, qualifier: string, valor: unknown) => ({
   timestart: `${start}T03:00:00.000Z`, timeend: `${end}T03:00:00.000Z`, qualifier, valor,
 });
 
-describe("inaStationId", () => {
-  it("cruza por id de Prefectura (id_externo)", () => {
-    expect(inaStationId(estaciones, 260)).toBe(32);
-    expect(inaStationId(estaciones, 250)).toBe(31);
-    expect(inaStationId(estaciones, 999)).toBeNull();
+describe("inaStationMap", () => {
+  it("id de Prefectura (id_externo) → id del INA", () => {
+    expect(inaStationMap(estaciones)).toEqual({ 230: 29, 250: 31, 260: 32 });
   });
-  it("con una respuesta rota da null", () => {
-    for (const bad of [null, "<html>", {}, [{ id: "x", id_externo: "260" }]]) expect(inaStationId(bad, 260)).toBeNull();
+  it("solo escalas de Prefectura: otra red con el mismo id_externo no se cruza", () => {
+    const otra = [...estaciones, { id: 920, id_externo: "999", tabla: "emas" }, { id: 921, id_externo: "260", tabla: "red_inta" }];
+    expect(inaStationMap(otra)).toEqual({ 230: 29, 250: 31, 260: 32 });
+  });
+  it("con una respuesta rota da null; id_externo vacío se saltea", () => {
+    for (const bad of [null, "<html>", {}, []]) expect(inaStationMap(bad)).toBeNull();
+    expect(inaStationMap([{ id: 5, id_externo: null, tabla: "alturas_prefe" }, ...estaciones])).toEqual({ 230: 29, 250: 31, 260: 32 });
   });
 });
 
@@ -69,31 +72,30 @@ describe("inaFor", () => {
   });
 });
 
-describe("fetchIna", () => {
+describe("fetchInaStations / fetchInaRun", () => {
   afterEach(() => vi.unstubAllGlobals());
-  const respond = (byUrl: (u: string) => unknown) =>
-    vi.stubGlobal("fetch", vi.fn(async (u: string) => {
-      const body = byUrl(u);
-      return body instanceof Error ? Promise.reject(body) : new Response(typeof body === "string" ? body : JSON.stringify(body));
-    }));
+  const respond = (body: unknown) =>
+    vi.stubGlobal("fetch", vi.fn(async () => (body instanceof Error ? Promise.reject(body) : new Response(typeof body === "string" ? body : JSON.stringify(body)))));
+  const urls = () => (fetch as unknown as { mock: { calls: string[][] } }).mock.calls.map((c) => c[0]);
 
-  it("busca el puerto y pide su corrida", async () => {
-    respond((u) => (u.includes("estaciones") ? estaciones : corrida));
-    const f = await fetchIna(260);
-    expect(f?.weeks).toHaveLength(9);
-    const urls = (fetch as unknown as { mock: { calls: string[][] } }).mock.calls.map((c) => c[0]);
-    expect(urls[1]).toContain("calibrados/434/corridas/last?");
-    expect(urls[1]).toContain("estacion_id=32");
+  it("la lista de puertos es un solo pedido, para todos", async () => {
+    respond(estaciones);
+    expect(await fetchInaStations()).toEqual({ 230: 29, 250: 31, 260: 32 });
+    expect(urls()).toEqual(["https://alerta.ina.gob.ar/a5/obs/puntual/estaciones?tabla=alturas_prefe"]);
   });
-  it("puerto que el INA no tiene: null sin pedir la corrida", async () => {
-    respond(() => estaciones);
-    expect(await fetchIna(999)).toBeNull();
-    expect((fetch as unknown as { mock: { calls: unknown[] } }).mock.calls).toHaveLength(1);
+  it("la corrida se pide filtrada por puerto", async () => {
+    respond(corrida);
+    expect((await fetchInaRun(32))?.weeks).toHaveLength(9);
+    expect(urls()).toHaveLength(1);
+    expect(urls()[0]).toContain("calibrados/434/corridas/last?");
+    expect(urls()[0]).toContain("estacion_id=32");
   });
   it("si la API falla o devuelve HTML: null", async () => {
-    respond(() => new Error("timeout"));
-    expect(await fetchIna(260)).toBeNull();
-    respond(() => "<html>mantenimiento</html>");
-    expect(await fetchIna(260)).toBeNull();
+    respond(new Error("timeout"));
+    expect(await fetchInaStations()).toBeNull();
+    expect(await fetchInaRun(32)).toBeNull();
+    respond("<html>mantenimiento</html>");
+    expect(await fetchInaStations()).toBeNull();
+    expect(await fetchInaRun(32)).toBeNull();
   });
 });
