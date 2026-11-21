@@ -118,8 +118,8 @@ describe("inaLevelNote", () => {
   const s = { alertM: 4.6, evacuationM: 5.9 };
   it("describe sin ordenar, primero evacuación", () => {
     expect(inaLevelNote({ loM: 5.3, hiM: 5.43 }, s)).toBe("por encima del nivel de alerta de Prefectura (4,60 m)");
-    expect(inaLevelNote({ loM: 4.5, hiM: 4.7 }, s)).toBe("llega al nivel de alerta de Prefectura (4,60 m)");
-    expect(inaLevelNote({ loM: 5.8, hiM: 5.99 }, s)).toBe("llega al nivel de evacuación de Prefectura (5,90 m)");
+    expect(inaLevelNote({ loM: 4.5, hiM: 4.7 }, s)).toBe("el máximo previsto llega al nivel de alerta de Prefectura (4,60 m)");
+    expect(inaLevelNote({ loM: 5.8, hiM: 5.99 }, s)).toBe("el máximo previsto llega al nivel de evacuación de Prefectura (5,90 m)");
     expect(inaLevelNote({ loM: 4.0, hiM: 4.2 }, s)).toBeNull();
     expect(inaLevelNote({ loM: 5, hiM: 5 }, { alertM: null, evacuationM: null })).toBeNull();
   });

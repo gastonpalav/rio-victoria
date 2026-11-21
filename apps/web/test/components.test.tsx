@@ -226,3 +226,20 @@ describe("Forecast: el link al INA", () => {
     expect(document.body.textContent).not.toContain("Los pronósticos oficiales del Paraná los publica");
   });
 });
+
+describe("InaForecast con los niveles reales de Victoria", () => {
+  it("compara con el nivel de evacuación de Prefectura (4,90) y no da órdenes", () => {
+    const ina = {
+      runDate: "2026-11-20T03:00:00.000Z",
+      weeks: [
+        { start: "2026-11-20T03:00:00.000Z", end: "2026-11-27T03:00:00.000Z", loM: 4.8, hiM: 5.0 },
+        { start: "2026-11-27T03:00:00.000Z", end: "2026-12-04T03:00:00.000Z", loM: 5.37, hiM: 5.39 },
+      ],
+    };
+    render(<InaForecast ina={ina} station={victoria} />);
+    const t = document.body.textContent ?? "";
+    expect(t).toContain("el máximo previsto llega al nivel de evacuación de Prefectura (4,90 m)");
+    expect(t).toContain("por encima del nivel de evacuación de Prefectura (4,90 m)");
+    expect(t).not.toMatch(/evacu(á|ar|en|e)\b|deb(e|en|és) /i);
+  });
+});

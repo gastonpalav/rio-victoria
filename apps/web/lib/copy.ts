@@ -155,7 +155,7 @@ export function inaLevelNote(
   for (const [m, name] of levels) {
     if (m === null) continue;
     if (w.loM >= m) return `por encima del nivel de ${name} de Prefectura (${fmtM(m)} m)`;
-    if (w.hiM >= m) return `llega al nivel de ${name} de Prefectura (${fmtM(m)} m)`;
+    if (w.hiM >= m) return `el máximo previsto llega al nivel de ${name} de Prefectura (${fmtM(m)} m)`;
   }
   return null;
 }

@@ -2,7 +2,7 @@ import { cacheLife, cacheTag } from "next/cache";
 import { type Db, createDb, getMaxSince, getStations } from "@rio/core";
 import { buildReadingsPayload, buildStationsPayload, toDto } from "./api";
 import { buildExtras } from "./extras";
-import { fetchIna, inaFor } from "./ina";
+import { fetchInaRun, fetchInaStations, inaFor } from "./ina";
 import { fetchWind } from "./wind";
 
 export const READINGS_TAG = "readings";
@@ -71,14 +71,33 @@ export async function getWind(slug: string) {
   return fetchWind(slug);
 }
 
+/** Si el INA falla, se vuelve a probar en 5 min y no en horas: un error no tiene que esconder la sección. */
+const INA_RETRY = { stale: 60, revalidate: 300, expire: 600 } as const;
+
+/** Qué puertos de Prefectura conoce el INA. Una entrada de caché para todos; cambia casi nunca. */
+export async function getInaStations() {
+  "use cache";
+  const map = await fetchInaStations();
+  cacheLife(map ? { stale: 3600, revalidate: 86_400, expire: 172_800 } : INA_RETRY);
+  return map;
+}
+
 /**
  * El pronóstico del INA para un puerto (por id de Prefectura), ya recortado a lo que se muestra.
- * Caché de 1 h: el INA corre su modelo una o dos veces por semana. Si falla, no se muestra.
+ * Caché de 1 h: el INA corre su modelo una o dos veces por semana. Es un solo pedido por puerto (la lista de
+ * puertos está en su propia caché), con timeout de 4 s; si falla, no se muestra y se reintenta en 5 min.
  */
 export async function getInaForecast(prefectureId: number) {
   "use cache";
-  cacheLife({ stale: 300, revalidate: 3600, expire: 7200 });
-  return inaFor(await fetchIna(prefectureId), new Date());
+  const stations = await getInaStations();
+  const inaId = stations?.[prefectureId];
+  if (stations && inaId === undefined) {
+    cacheLife("hours"); // el INA no cubre este puerto
+    return null;
+  }
+  const run = inaId === undefined ? null : await fetchInaRun(inaId);
+  cacheLife(run ? { stale: 300, revalidate: 3600, expire: 7200 } : INA_RETRY);
+  return inaFor(run, new Date());
 }
 
 /** "Ahora" redondeado a 5 minutos, para que la caché se comparta entre pedidos. */
