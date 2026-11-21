@@ -13,6 +13,7 @@ La pantalla principal es una **regla hidrométrica** — la escala pintada con "
 - Gráfica de 7 días, 1 mes, 6 meses o 1 año, con eje de tiempo real.
 - **Lo que viene de arriba**: Diamante, Santa Fe y Paraná, porque lo que pasa ahí llega a Victoria días después.
 - **Cómo puede seguir**: una estimación propia a 1, 3 y 5 días, siempre como rango y con el error medido al lado (ver abajo).
+- **Lo que pronostica el INA**: su pronóstico oficial de la altura promedio de las próximas 4 semanas, con la fecha de la corrida, en los 20 puertos que cubre.
 - Los 89 puertos que publica Prefectura (`/rosario`, `/campana`, …).
 - Vista previa para WhatsApp con la altura y la hora de la lectura.
 
@@ -34,6 +35,7 @@ Vercel (región gru1, San Pablo)             │
 - **Upsert idempotente** por `(puerto, hora)`. Cuando la tabla principal y el historial no coinciden, gana la tabla: el historial va atrasado.
 - **Historia propia**: arrancó con el año que publica Prefectura y desde ahí se acumula sin límite.
 - **Por qué la lectura corre en Vercel**: Prefectura no responde a las IPs de Railway; desde la región de San Pablo sí. El cron de Railway sólo dispara la ruta protegida.
+- **El pronóstico del INA** se lee al cargar la página desde su API pública (`alerta.ina.gob.ar/a5`, modelo semanal 434), con caché de 1 h, y no se guarda. El INA identifica cada puerto con el id de Prefectura (`id_externo`). La corrida se pide filtrada por puerto, porque la serie no dice de qué puerto es, y tiene que venir exactamente una. No se muestra si la API falla o tarda más de 4 s, ni si la corrida tiene más de 10 días. Ojo: para algunos puertos el INA usa otros niveles que Prefectura (en Victoria, 5,90 m de evacuación contra 4,90 m). La página siempre compara con los de Prefectura y lo dice.
 
 ## La estimación
 
