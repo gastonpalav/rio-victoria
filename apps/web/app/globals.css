@@ -1086,3 +1086,50 @@ a.staff-cell:hover .staff-name {
     transition: none;
   }
 }
+
+/* ---------- Lo que pronostica el INA: una fila por semana, como una planilla pintada en la pared ---------- */
+.ina-tag {
+  display: inline-block;
+  margin-right: 6px;
+  padding: 1px 7px;
+  border: 1.5px solid var(--paint);
+  border-radius: 3px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--paint);
+  vertical-align: 1px;
+}
+.ina-weeks {
+  margin: 22px 0 0;
+  padding: 0;
+  max-width: 640px;
+  list-style: none;
+  border-top: 2px solid var(--paint);
+}
+.ina-week {
+  display: grid;
+  grid-template-columns: minmax(9.5em, auto) 1fr;
+  column-gap: 16px;
+  align-items: baseline;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+}
+.ina-when {
+  font-size: 15px;
+  color: var(--paint-soft);
+}
+.ina-value {
+  font-family: var(--font-display), sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--paint);
+}
+.ina-note {
+  grid-column: 2;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--alert-paint);
+}
