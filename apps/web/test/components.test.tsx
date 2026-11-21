@@ -2,6 +2,7 @@
 import { describe, it, expect, afterEach } from "vitest";
 import { render, screen, cleanup } from "@testing-library/react";
 import { Forecast } from "@/components/Forecast";
+import { InaForecast } from "@/components/InaForecast";
 import { Hero } from "@/components/Hero";
 import { SourceFooter } from "@/components/SourceFooter";
 import { Upstream } from "@/components/Upstream";
@@ -166,5 +167,62 @@ describe("Forecast: cómo puede seguir", () => {
     expect(render(<Forecast forecast={forecast} station={{ ...fresh, ts: "2026-11-15T15:00:00.000Z", stale: true }} />).container.innerHTML).toBe("");
     expect(render(<Forecast forecast={forecast} station={{ ...fresh, heightM: null }} />).container.innerHTML).toBe("");
     expect(render(<Forecast forecast={null} station={fresh} />).container.innerHTML).toBe("");
+  });
+});
+
+describe("InaForecast: lo que pronostica el INA", () => {
+  const ina = {
+    runDate: "2026-11-20T03:00:00.000Z",
+    weeks: [
+      { start: "2026-11-20T03:00:00.000Z", end: "2026-11-27T03:00:00.000Z", loM: 5.16, hiM: 5.16 },
+      { start: "2026-11-27T03:00:00.000Z", end: "2026-12-04T03:00:00.000Z", loM: 5.37, hiM: 5.39 },
+      { start: "2026-12-04T03:00:00.000Z", end: "2026-12-11T03:00:00.000Z", loM: 5.3, hiM: 5.43 },
+      { start: "2026-12-11T03:00:00.000Z", end: "2026-12-18T03:00:00.000Z", loM: 5.47, hiM: 5.74 },
+    ],
+  };
+  const station = { ...victoria, evacuationM: 5.9 };
+
+  it("muestra las semanas, la fecha de la corrida y el link", () => {
+    render(<InaForecast ina={ina} station={station} withEstimate />);
+    const t = document.body.textContent ?? "";
+    expect(screen.getByRole("heading", { name: "Lo que pronostica el INA" })).toBeTruthy();
+    expect(t).toContain("La estimación de arriba es el promedio de cada día");
+    expect(t).toContain("corrida del 20/11");
+    expect(t).toContain("20 al 26 nov");
+    expect(t).toContain("5,16 m");
+    expect(t).toContain("5,30 a 5,43 m");
+    expect(t).toContain("por encima del nivel de alerta de Prefectura (4,60 m)");
+    expect(t).toContain("no el pico");
+    expect(screen.getByRole("link", { name: /Instituto Nacional del Agua/ }).getAttribute("href")).toBe("https://www.ina.gob.ar/alerta/");
+    expect(screen.getAllByRole("listitem")).toHaveLength(4);
+    expect(t).not.toMatch(/evacu(á|ar|en)\b/i);
+  });
+
+  it("sin nuestra estimación no habla de \"la estimación de arriba\"", () => {
+    render(<InaForecast ina={ina} station={station} />);
+    expect(document.body.textContent).not.toContain("estimación de arriba");
+  });
+
+  it("sin datos no muestra nada", () => {
+    const { container } = render(<InaForecast ina={null} station={station} />);
+    expect(container.innerHTML).toBe("");
+  });
+});
+
+describe("Forecast: el link al INA", () => {
+  const forecast = {
+    days: [{ date: "2026-11-22", ahead: 1, loM: 4.84, hiM: 4.95, maeM: 0.019, recentMaeM: 0.019 }],
+    coverage: 0.76,
+    tested: 180,
+    from: ["Diamante"],
+  };
+  const fresh: StationDto = { ...victoria, ts: new Date(Date.now() - 3_600_000).toISOString() };
+
+  it("vuelve al final solo si no se muestra el bloque del INA", () => {
+    render(<Forecast forecast={forecast} station={fresh} />);
+    expect(document.body.textContent).toContain("Los pronósticos oficiales del Paraná los publica");
+    cleanup();
+    render(<Forecast forecast={forecast} station={fresh} inaShown />);
+    expect(document.body.textContent).not.toContain("Los pronósticos oficiales del Paraná los publica");
   });
 });

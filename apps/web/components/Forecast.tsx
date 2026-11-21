@@ -17,12 +17,33 @@ const list = (xs: string[]) => (xs.length <= 1 ? xs.join("") : `${xs.slice(0, -1
  * Si el dato de hoy es viejo no se muestra nada; eso se vuelve a mirar en el navegador, como en el resto de la
  * página, porque la pestaña puede quedar abierta.
  */
-export function Forecast({ forecast, station }: { forecast: ForecastView | null; station: StationDto }) {
+export function Forecast({
+  forecast,
+  station,
+  inaShown = false,
+}: {
+  forecast: ForecastView | null;
+  station: StationDto;
+  /** Si se muestra el pronóstico del INA debajo, el link al INA ya está ahí. */
+  inaShown?: boolean;
+}) {
   if (!forecast || forecast.days.length === 0 || station.heightM === null || station.ts === null) return null;
-  return <ForecastBody forecast={forecast} station={station} nowM={station.heightM} ts={station.ts} />;
+  return <ForecastBody forecast={forecast} station={station} nowM={station.heightM} ts={station.ts} inaShown={inaShown} />;
 }
 
-function ForecastBody({ forecast, station, nowM, ts }: { forecast: ForecastView; station: StationDto; nowM: number; ts: string }) {
+function ForecastBody({
+  forecast,
+  station,
+  nowM,
+  ts,
+  inaShown,
+}: {
+  forecast: ForecastView;
+  station: StationDto;
+  nowM: number;
+  ts: string;
+  inaShown: boolean;
+}) {
   const stale = useStale(ts, station.periodHours, station.stale);
   if (stale) return null;
   const { days } = forecast;
@@ -128,13 +149,15 @@ function ForecastBody({ forecast, station, nowM, ts }: { forecast: ForecastView;
           aparece. No sabe nada de lluvias ni de represas: solo mira alturas.
         </p>
       </details>
-      <p className="forecast-proof">
-        Los pronósticos oficiales del Paraná los publica el{" "}
-        <a href="https://www.ina.gob.ar/alerta/" rel="noopener">
-          Instituto Nacional del Agua
-        </a>
-        .
-      </p>
+      {!inaShown && (
+        <p className="forecast-proof">
+          Los pronósticos oficiales del Paraná los publica el{" "}
+          <a href="https://www.ina.gob.ar/alerta/" rel="noopener">
+            Instituto Nacional del Agua
+          </a>
+          .
+        </p>
+      )}
     </section>
   );
 }

@@ -140,7 +140,10 @@ export function inaRunLabel(runDate: string): string {
   return `${d.getUTCDate()}/${d.getUTCMonth() + 1}`;
 }
 
-/** Qué dice una semana del INA sobre los niveles de Prefectura. Describe, nunca ordena. */
+/**
+ * Qué dice una semana del INA sobre los niveles de Prefectura. Dice "de Prefectura" porque el INA a veces usa otra
+ * cifra para el mismo nivel (en Victoria, 5,90 m de evacuación contra 4,90 m). Describe, nunca ordena.
+ */
 export function inaLevelNote(
   w: { loM: number; hiM: number },
   s: { alertM: number | null; evacuationM: number | null },
@@ -151,8 +154,8 @@ export function inaLevelNote(
   ];
   for (const [m, name] of levels) {
     if (m === null) continue;
-    if (w.loM >= m) return `por encima del nivel de ${name} (${fmtM(m)} m)`;
-    if (w.hiM >= m) return `llega al nivel de ${name} (${fmtM(m)} m)`;
+    if (w.loM >= m) return `por encima del nivel de ${name} de Prefectura (${fmtM(m)} m)`;
+    if (w.hiM >= m) return `llega al nivel de ${name} de Prefectura (${fmtM(m)} m)`;
   }
   return null;
 }
