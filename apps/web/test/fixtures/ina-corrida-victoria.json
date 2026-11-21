@@ -1,0 +1,177 @@
+{
+ "id": 1250473,
+ "forecast_date": "2026-11-20T03:00:00.000Z",
+ "series": [
+  {
+   "series_table": "series",
+   "series_id": 26219,
+   "cor_id": 1250473,
+   "pronosticos": [
+    {
+     "timestart": "2026-11-13T03:00:00.000Z",
+     "timeend": "2026-11-20T03:00:00.000Z",
+     "valor": 4.66,
+     "qualifier": "main"
+    },
+    {
+     "timestart": "2026-11-13T03:00:00.000Z",
+     "timeend": "2026-11-20T03:00:00.000Z",
+     "valor": 4.66,
+     "qualifier": "max"
+    },
+    {
+     "timestart": "2026-11-13T03:00:00.000Z",
+     "timeend": "2026-11-20T03:00:00.000Z",
+     "valor": 4.66,
+     "qualifier": "min"
+    },
+    {
+     "timestart": "2026-11-20T03:00:00.000Z",
+     "timeend": "2026-11-27T03:00:00.000Z",
+     "valor": 5.16,
+     "qualifier": "main"
+    },
+    {
+     "timestart": "2026-11-20T03:00:00.000Z",
+     "timeend": "2026-11-27T03:00:00.000Z",
+     "valor": 5.16,
+     "qualifier": "max"
+    },
+    {
+     "timestart": "2026-11-20T03:00:00.000Z",
+     "timeend": "2026-11-27T03:00:00.000Z",
+     "valor": 5.16,
+     "qualifier": "min"
+    },
+    {
+     "timestart": "2026-11-27T03:00:00.000Z",
+     "timeend": "2026-12-04T03:00:00.000Z",
+     "valor": 5.38,
+     "qualifier": "main"
+    },
+    {
+     "timestart": "2026-11-27T03:00:00.000Z",
+     "timeend": "2026-12-04T03:00:00.000Z",
+     "valor": 5.39,
+     "qualifier": "max"
+    },
+    {
+     "timestart": "2026-11-27T03:00:00.000Z",
+     "timeend": "2026-12-04T03:00:00.000Z",
+     "valor": 5.37,
+     "qualifier": "min"
+    },
+    {
+     "timestart": "2026-12-04T03:00:00.000Z",
+     "timeend": "2026-12-11T03:00:00.000Z",
+     "valor": 5.35,
+     "qualifier": "main"
+    },
+    {
+     "timestart": "2026-12-04T03:00:00.000Z",
+     "timeend": "2026-12-11T03:00:00.000Z",
+     "valor": 5.43,
+     "qualifier": "max"
+    },
+    {
+     "timestart": "2026-12-04T03:00:00.000Z",
+     "timeend": "2026-12-11T03:00:00.000Z",
+     "valor": 5.3,
+     "qualifier": "min"
+    },
+    {
+     "timestart": "2026-12-11T03:00:00.000Z",
+     "timeend": "2026-12-18T03:00:00.000Z",
+     "valor": 5.58,
+     "qualifier": "main"
+    },
+    {
+     "timestart": "2026-12-11T03:00:00.000Z",
+     "timeend": "2026-12-18T03:00:00.000Z",
+     "valor": 5.74,
+     "qualifier": "max"
+    },
+    {
+     "timestart": "2026-12-11T03:00:00.000Z",
+     "timeend": "2026-12-18T03:00:00.000Z",
+     "valor": 5.47,
+     "qualifier": "min"
+    },
+    {
+     "timestart": "2026-12-18T03:00:00.000Z",
+     "timeend": "2026-12-25T03:00:00.000Z",
+     "valor": 5.58,
+     "qualifier": "main"
+    },
+    {
+     "timestart": "2026-12-18T03:00:00.000Z",
+     "timeend": "2026-12-25T03:00:00.000Z",
+     "valor": 5.83,
+     "qualifier": "max"
+    },
+    {
+     "timestart": "2026-12-18T03:00:00.000Z",
+     "timeend": "2026-12-25T03:00:00.000Z",
+     "valor": 5.41,
+     "qualifier": "min"
+    },
+    {
+     "timestart": "2026-12-25T03:00:00.000Z",
+     "timeend": "2027-01-01T03:00:00.000Z",
+     "valor": 5.5,
+     "qualifier": "main"
+    },
+    {
+     "timestart": "2026-12-25T03:00:00.000Z",
+     "timeend": "2027-01-01T03:00:00.000Z",
+     "valor": 5.83,
+     "qualifier": "max"
+    },
+    {
+     "timestart": "2026-12-25T03:00:00.000Z",
+     "timeend": "2027-01-01T03:00:00.000Z",
+     "valor": 5.28,
+     "qualifier": "min"
+    },
+    {
+     "timestart": "2027-01-01T03:00:00.000Z",
+     "timeend": "2027-01-08T03:00:00.000Z",
+     "valor": 5.46,
+     "qualifier": "main"
+    },
+    {
+     "timestart": "2027-01-01T03:00:00.000Z",
+     "timeend": "2027-01-08T03:00:00.000Z",
+     "valor": 5.88,
+     "qualifier": "max"
+    },
+    {
+     "timestart": "2027-01-01T03:00:00.000Z",
+     "timeend": "2027-01-08T03:00:00.000Z",
+     "valor": 5.18,
+     "qualifier": "min"
+    },
+    {
+     "timestart": "2027-01-08T03:00:00.000Z",
+     "timeend": "2027-01-15T03:00:00.000Z",
+     "valor": 5.49,
+     "qualifier": "main"
+    },
+    {
+     "timestart": "2027-01-08T03:00:00.000Z",
+     "timeend": "2027-01-15T03:00:00.000Z",
+     "valor": 5.99,
+     "qualifier": "max"
+    },
+    {
+     "timestart": "2027-01-08T03:00:00.000Z",
+     "timeend": "2027-01-15T03:00:00.000Z",
+     "valor": 5.15,
+     "qualifier": "min"
+    }
+   ],
+   "tipo": "puntual"
+  }
+ ],
+ "cal_id": 434
+}

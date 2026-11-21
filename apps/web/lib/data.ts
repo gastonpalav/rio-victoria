@@ -2,6 +2,7 @@ import { cacheLife, cacheTag } from "next/cache";
 import { type Db, createDb, getMaxSince, getStations } from "@rio/core";
 import { buildReadingsPayload, buildStationsPayload, toDto } from "./api";
 import { buildExtras } from "./extras";
+import { fetchIna, inaFor } from "./ina";
 import { fetchWind } from "./wind";
 
 export const READINGS_TAG = "readings";
@@ -48,6 +49,7 @@ export async function getStationPage(slug: string) {
   ]);
   const upstream = extras.upstreamSlugs.flatMap((u) => stations.filter((s) => s.slug === u));
   return {
+    prefectureId: here.id,
     yearMax: max ? { ts: max.ts.toISOString(), heightM: max.heightM } : null,
     station,
     upstream,
@@ -67,6 +69,16 @@ export async function getWind(slug: string) {
   "use cache";
   cacheLife({ stale: 300, revalidate: 1800, expire: 7200 });
   return fetchWind(slug);
+}
+
+/**
+ * El pronóstico del INA para un puerto (por id de Prefectura), ya recortado a lo que se muestra.
+ * Caché de 1 h: el INA corre su modelo una o dos veces por semana. Si falla, no se muestra.
+ */
+export async function getInaForecast(prefectureId: number) {
+  "use cache";
+  cacheLife({ stale: 300, revalidate: 3600, expire: 7200 });
+  return inaFor(await fetchIna(prefectureId), new Date());
 }
 
 /** "Ahora" redondeado a 5 minutos, para que la caché se comparta entre pedidos. */
