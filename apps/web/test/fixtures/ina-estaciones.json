@@ -1,0 +1,20 @@
+[
+ {
+  "id": 29,
+  "nombre": "Paraná",
+  "id_externo": "230",
+  "tabla": "alturas_prefe"
+ },
+ {
+  "id": 31,
+  "nombre": "Diamante",
+  "id_externo": "250",
+  "tabla": "alturas_prefe"
+ },
+ {
+  "id": 32,
+  "nombre": "Victoria",
+  "id_externo": "260",
+  "tabla": "alturas_prefe"
+ }
+]
